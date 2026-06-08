@@ -1,0 +1,67 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Variables CSS globales */
+:root {
+  --brand-primary: #6366f1;
+  --brand-dark:    #4338ca;
+  --surface-bg:    #fafafa;
+}
+
+/* Scrollbar premium (Chrome/Edge) */
+::-webkit-scrollbar       { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #d4d4d8; border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: #a1a1aa; }
+
+/* Sélection de texte */
+::selection { background: #c7d2fe; color: #312e81; }
+
+/* Focus ring global cohérent */
+:focus-visible {
+  outline: 2px solid #6366f1;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Transitions fluides par défaut */
+* { transition-property: color, background-color, border-color, opacity, box-shadow;
+    transition-duration: 150ms;
+    transition-timing-function: ease; }
+
+@layer components {
+  /* Bouton primaire */
+  .btn-primary {
+    @apply inline-flex items-center gap-2 px-4 py-2 bg-brand-600 hover:bg-brand-700
+           text-white text-sm font-medium rounded-lg shadow-xs
+           transition-all duration-150 active:scale-[0.98] disabled:opacity-50
+           disabled:cursor-not-allowed focus-visible:ring-2 focus-visible:ring-brand-500;
+  }
+  /* Bouton secondaire */
+  .btn-secondary {
+    @apply inline-flex items-center gap-2 px-4 py-2 bg-white hover:bg-surface-50
+           text-surface-700 text-sm font-medium rounded-lg border border-surface-200
+           shadow-xs transition-all duration-150 active:scale-[0.98];
+  }
+  /* Bouton ghost */
+  .btn-ghost {
+    @apply inline-flex items-center gap-2 px-3 py-1.5 text-surface-600
+           hover:bg-surface-100 text-sm font-medium rounded-md transition-all duration-150;
+  }
+  /* Carte standard */
+  .card {
+    @apply bg-white rounded-xl border border-surface-200 shadow-sm;
+  }
+  /* Input standard */
+  .input {
+    @apply w-full px-3 py-2 bg-white border border-surface-200 rounded-lg text-sm
+           text-surface-900 placeholder-surface-400 shadow-inner
+           focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent
+           transition-all duration-150;
+  }
+  /* Badge */
+  .badge {
+    @apply inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium;
+  }
+}
