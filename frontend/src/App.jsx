@@ -1,30 +1,30 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { useAuthStore } from '@/store/authStore'
+import AppLayout from '@/components/layout/AppLayout'
 
-// Pages auth
+// Auth
 import LoginPage from '@/pages/auth/LoginPage'
 
-// Pages par rôle (placeholders pour l'instant — à compléter plus tard)
-import ParentDashboard    from '@/pages/parent/ParentDashboard'
-import StudentDashboard   from '@/pages/student/StudentDashboard'
-import TeacherDashboard   from '@/pages/teacher/TeacherDashboard'
+// Dashboards
+import ParentDashboard     from '@/pages/parent/ParentDashboard'
+import StudentDashboard    from '@/pages/student/StudentDashboard'
+import TeacherDashboard    from '@/pages/teacher/TeacherDashboard'
 import AccountantDashboard from '@/pages/accountant/AccountantDashboard'
-import DirectorDashboard  from '@/pages/director/DirectorDashboard'
-import FounderDashboard   from '@/pages/founder/FounderDashboard'
+import DirectorDashboard   from '@/pages/director/DirectorDashboard'
+import FounderDashboard    from '@/pages/founder/FounderDashboard'
 import SuperAdminDashboard from '@/pages/superadmin/SuperAdminDashboard'
 
-// Composant de protection des routes
+// Protection des routes avec layout intégré
 function ProtectedRoute({ children, allowedRoles }) {
   const { isAuthenticated, user } = useAuthStore()
-
   if (!isAuthenticated) return <Navigate to="/login" replace />
   if (allowedRoles && !allowedRoles.includes(user?.role)) {
     return <Navigate to="/login" replace />
   }
-  return children
+  return <AppLayout>{children}</AppLayout>
 }
 
-// Redirection intelligente selon le rôle
+// Redirection selon le rôle
 function RoleRedirect() {
   const { isAuthenticated, user } = useAuthStore()
   if (!isAuthenticated) return <Navigate to="/login" replace />
@@ -44,22 +44,24 @@ function RoleRedirect() {
 export default function App() {
   return (
     <Routes>
-      {/* Public */}
       <Route path="/login" element={<LoginPage />} />
+      <Route path="/"      element={<RoleRedirect />} />
 
-      {/* Redirection racine */}
-      <Route path="/" element={<RoleRedirect />} />
+      <Route path="/parent/*"
+        element={<ProtectedRoute allowedRoles={['parent']}><ParentDashboard /></ProtectedRoute>} />
+      <Route path="/student/*"
+        element={<ProtectedRoute allowedRoles={['student']}><StudentDashboard /></ProtectedRoute>} />
+      <Route path="/teacher/*"
+        element={<ProtectedRoute allowedRoles={['teacher']}><TeacherDashboard /></ProtectedRoute>} />
+      <Route path="/accountant/*"
+        element={<ProtectedRoute allowedRoles={['accountant']}><AccountantDashboard /></ProtectedRoute>} />
+      <Route path="/director/*"
+        element={<ProtectedRoute allowedRoles={['school_admin']}><DirectorDashboard /></ProtectedRoute>} />
+      <Route path="/founder/*"
+        element={<ProtectedRoute allowedRoles={['founder']}><FounderDashboard /></ProtectedRoute>} />
+      <Route path="/superadmin/*"
+        element={<ProtectedRoute allowedRoles={['super_admin']}><SuperAdminDashboard /></ProtectedRoute>} />
 
-      {/* Routes protégées par rôle */}
-      <Route path="/parent/*"     element={<ProtectedRoute allowedRoles={['parent']}><ParentDashboard /></ProtectedRoute>} />
-      <Route path="/student/*"    element={<ProtectedRoute allowedRoles={['student']}><StudentDashboard /></ProtectedRoute>} />
-      <Route path="/teacher/*"    element={<ProtectedRoute allowedRoles={['teacher']}><TeacherDashboard /></ProtectedRoute>} />
-      <Route path="/accountant/*" element={<ProtectedRoute allowedRoles={['accountant']}><AccountantDashboard /></ProtectedRoute>} />
-      <Route path="/director/*"   element={<ProtectedRoute allowedRoles={['school_admin']}><DirectorDashboard /></ProtectedRoute>} />
-      <Route path="/founder/*"    element={<ProtectedRoute allowedRoles={['founder']}><FounderDashboard /></ProtectedRoute>} />
-      <Route path="/superadmin/*" element={<ProtectedRoute allowedRoles={['super_admin']}><SuperAdminDashboard /></ProtectedRoute>} />
-
-      {/* 404 */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   )

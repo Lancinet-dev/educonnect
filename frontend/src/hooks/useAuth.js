@@ -27,9 +27,6 @@ export function useAuth() {
       }
       navigate(routes[data.user.role] || '/')
     },
-    onError: (err) => {
-      toast.error(err.response?.data?.error || 'Connexion impossible.')
-    },
   })
 
   const logout = async () => {
@@ -49,7 +46,7 @@ export function useAuth() {
     role:            store.getRole(),
     fullName:        store.getFullName(),
     schoolId:        store.getSchoolId(),
-    login:           loginMutation.mutate,
+    login:           loginMutation.mutateAsync,
     isLoggingIn:     loginMutation.isPending,
     logout,
   }

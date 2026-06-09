@@ -9,6 +9,7 @@ import rateLimit from 'express-rate-limit'
 
 import { pool } from './db/pool.js'
 import { errorHandler } from './middleware/error.middleware.js'
+import authRoutes from './routes/auth.routes.js'
 
 const app        = express()
 const httpServer = createServer(app)
@@ -42,10 +43,8 @@ app.use(rateLimit({
   message:  { error: 'Trop de requêtes. Réessayez dans 15 minutes.' },
 }))
 
-// ── Routes (à ajouter progressivement) ────────────────
-// app.use('/api/auth',  authRoutes)
-// app.use('/api/users', userRoutes)
-// etc.
+// ── Routes ────────────────────────────────────────────
+app.use('/api/auth', authRoutes)
 
 // Health check
 app.get('/api/health', async (req, res) => {
