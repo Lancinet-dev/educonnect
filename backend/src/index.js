@@ -60,7 +60,7 @@ app.get('/api/health', async (req, res) => {
 app.use(errorHandler)
 
 // ── Démarrage ──────────────────────────────────────────
-const PORT = process.env.PORT || 5001
+const PORT = process.env.PORT || 5000
 httpServer.listen(PORT, () => {
   console.log(`\n🚀  EduConnect API → http://localhost:${PORT}`)
   console.log(`📡  Socket.IO actif`)
