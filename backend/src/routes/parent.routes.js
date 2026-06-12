@@ -1,6 +1,7 @@
 import express from 'express'
 import { authenticate, authorize } from '../middleware/auth.middleware.js'
 import { query } from '../db/pool.js'
+import { getStudentResults } from '../services/grades.service.js'
 
 const router = express.Router()
 
@@ -48,32 +49,12 @@ router.get('/overview', async (req, res, next) => {
     }
 
     const childIds = children.map(c => c.id)
-    const classIds = [...new Set(children.map(c => c.class_id).filter(Boolean))]
 
-    // 2. Moyennes & rangs par classe (table grades vide pour l'instant → vide)
+    // 2. Moyennes & rangs (calcul pondéré centralisé)
     const rankMap = {}
-    if (classIds.length) {
-      const { rows } = await query(
-        `SELECT cs.class_id, g.student_id,
-                ROUND(AVG(g.value / g.max_value * 20), 2) AS average
-         FROM class_students cs
-         JOIN grades g ON g.student_id = cs.student_id
-         WHERE cs.class_id = ANY($1)
-         GROUP BY cs.class_id, g.student_id`,
-        [classIds]
-      )
-      const byClass = {}
-      for (const r of rows) (byClass[r.class_id] ||= []).push(r)
-      for (const cid of Object.keys(byClass)) {
-        byClass[cid].sort((a, b) => b.average - a.average)
-        byClass[cid].forEach((r, i) => {
-          rankMap[r.student_id] = {
-            average: parseFloat(r.average),
-            rank: i + 1,
-            classSize: byClass[cid].length,
-          }
-        })
-      }
+    for (const c of children) {
+      const r = await getStudentResults(c.id)
+      rankMap[c.id] = { average: r.generalAverage, rank: r.rank, classSize: r.classSize }
     }
 
     // 3. Derniers paiements (par enfant)

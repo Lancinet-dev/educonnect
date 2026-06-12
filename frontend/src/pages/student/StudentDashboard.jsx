@@ -1,13 +1,17 @@
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, useNavigate } from 'react-router-dom'
 import {
   CheckCircle2, XCircle, Clock, HelpCircle,
-  BookOpen, ClipboardList, Calendar, Wallet
+  BookOpen, ClipboardList, Calendar, Wallet, Download
 } from 'lucide-react'
 import { useStudentOverview } from '@/hooks/useStudentData'
+import { useAuth } from '@/hooks/useAuth'
+import { downloadBulletin } from '@/hooks/useGrades'
 import Card from '@/components/ui/Card'
 import Avatar from '@/components/ui/Avatar'
+import Button from '@/components/ui/Button'
 import Spinner from '@/components/ui/Spinner'
 import { formatGNF } from '@/utils/format'
+import StudentGrades from './StudentGrades'
 
 const ATTENDANCE = {
   present: { label: 'Présent(e)',      icon: CheckCircle2, bg: 'bg-emerald-50', text: 'text-emerald-700', ring: 'border-emerald-200' },
@@ -19,6 +23,8 @@ const ATTENDANCE_NONE = { label: 'Non renseignée', icon: HelpCircle, bg: 'bg-su
 
 function Overview() {
   const { data, isLoading, error } = useStudentOverview()
+  const { user, fullName } = useAuth()
+  const navigate = useNavigate()
 
   if (isLoading) {
     return <div className="flex items-center justify-center h-96"><Spinner /></div>
@@ -27,7 +33,7 @@ function Overview() {
     return <Card className="text-center py-12"><p className="text-red-600">Erreur lors du chargement des données.</p></Card>
   }
 
-  const { student, attendanceToday, grades, average, timetable, homework, fees } = data
+  const { student, attendanceToday, grades, average, rank, classSize, timetable, homework, fees } = data
   const a = ATTENDANCE[attendanceToday] || ATTENDANCE_NONE
   const AIcon = a.icon
 
@@ -60,13 +66,18 @@ function Overview() {
           <p className={`text-xl font-bold mt-0.5 ${a.text}`}>{a.label}</p>
         </div>
 
-        {/* Moyenne */}
+        {/* Moyenne + rang */}
         <div className="rounded-2xl border border-surface-200 bg-white p-6 flex flex-col items-center justify-center text-center">
           <BookOpen size={40} className="text-violet-500" />
           {average != null ? (
             <>
               <p className="text-xs font-medium text-surface-500 uppercase tracking-wide mt-3">Ma moyenne</p>
               <p className="text-2xl font-bold text-surface-900 mt-0.5">{average}/20</p>
+              {rank != null && (
+                <p className="text-sm text-surface-500 mt-1">
+                  {rank}<sup>{rank === 1 ? 'er' : 'e'}</sup> sur {classSize}
+                </p>
+              )}
             </>
           ) : (
             <>
@@ -150,9 +161,15 @@ function Overview() {
 
       {/* Dernières notes */}
       <Card>
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center justify-between mb-4 gap-2">
           <h3 className="font-semibold text-surface-900">Mes dernières notes</h3>
-          <BookOpen size={16} className="text-surface-400" />
+          {average != null && (
+            <div className="flex gap-2">
+              <Button variant="ghost" size="sm" onClick={() => navigate('/student/notes')}>Voir tout</Button>
+              <Button variant="secondary" size="sm" icon={<Download size={15} />}
+                onClick={() => downloadBulletin(student.id, fullName)}>Bulletin</Button>
+            </div>
+          )}
         </div>
         {grades.length === 0 ? (
           <div className="text-center py-8">
@@ -182,6 +199,7 @@ export default function StudentDashboard() {
   return (
     <Routes>
       <Route index element={<Overview />} />
+      <Route path="notes" element={<StudentGrades />} />
     </Routes>
   )
 }

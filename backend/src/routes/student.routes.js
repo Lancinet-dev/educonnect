@@ -1,6 +1,7 @@
 import express from 'express'
 import { authenticate, authorize } from '../middleware/auth.middleware.js'
 import { query } from '../db/pool.js'
+import { getStudentResults } from '../services/grades.service.js'
 
 const router = express.Router()
 
@@ -46,9 +47,8 @@ router.get('/overview', async (req, res, next) => {
       [studentId]
     )
 
-    const average = grades.length
-      ? Math.round((grades.reduce((sum, g) => sum + (g.value / g.max_value * 20), 0) / grades.length) * 100) / 100
-      : null
+    // Moyenne générale pondérée + rang (calcul centralisé)
+    const results = await getStudentResults(studentId)
 
     // 3. Emploi du temps du jour (selon la classe)
     let timetable = []
@@ -106,7 +106,9 @@ router.get('/overview', async (req, res, next) => {
         type:      g.evaluation_type,
         gradedAt:  g.graded_at,
       })),
-      average,
+      average:   results.generalAverage,
+      rank:      results.rank,
+      classSize: results.classSize,
       timetable,
       homework: [], // module devoirs à venir
       fees: {

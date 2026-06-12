@@ -12,6 +12,7 @@ import Avatar from '@/components/ui/Avatar'
 import Spinner from '@/components/ui/Spinner'
 import { formatGNF } from '@/utils/format'
 import ParentAttendance from './ParentAttendance'
+import ParentResults from './ParentResults'
 
 // ── Affichage du statut de présence (gros bloc coloré) ────────
 const ATTENDANCE = {
@@ -216,6 +217,7 @@ export default function ParentDashboard() {
     <Routes>
       <Route index element={<Overview />} />
       <Route path="presences" element={<ParentAttendance />} />
+      <Route path="resultats" element={<ParentResults />} />
     </Routes>
   )
 }

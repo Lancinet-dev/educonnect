@@ -1,7 +1,7 @@
 import { Routes, Route, useNavigate } from 'react-router-dom'
 import {
   BookOpen, Users, CheckCircle2, AlertTriangle,
-  Calendar, GraduationCap, Clock, ClipboardCheck
+  Calendar, GraduationCap, Clock, ClipboardCheck, PlusCircle
 } from 'lucide-react'
 import { useTeacherOverview } from '@/hooks/useTeacherData'
 import { useAuth } from '@/hooks/useAuth'
@@ -12,6 +12,7 @@ import Button from '@/components/ui/Button'
 import Spinner from '@/components/ui/Spinner'
 import { formatPercent } from '@/utils/format'
 import TeacherAttendance from './TeacherAttendance'
+import TeacherGrades from './TeacherGrades'
 
 function Overview() {
   const { data, isLoading, error } = useTeacherOverview()
@@ -41,9 +42,14 @@ function Overview() {
             {new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
           </p>
         </div>
-        <Button size="lg" icon={<ClipboardCheck size={18} />} onClick={() => navigate('/teacher/presences')}>
-          Faire l'appel
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="secondary" size="lg" icon={<PlusCircle size={18} />} onClick={() => navigate('/teacher/notes?new=1')}>
+            Ajouter une note
+          </Button>
+          <Button size="lg" icon={<ClipboardCheck size={18} />} onClick={() => navigate('/teacher/presences')}>
+            Faire l'appel
+          </Button>
+        </div>
       </div>
 
       {/* Chiffres clés */}
@@ -171,6 +177,7 @@ export default function TeacherDashboard() {
     <Routes>
       <Route index element={<Overview />} />
       <Route path="presences" element={<TeacherAttendance />} />
+      <Route path="notes" element={<TeacherGrades />} />
     </Routes>
   )
 }
