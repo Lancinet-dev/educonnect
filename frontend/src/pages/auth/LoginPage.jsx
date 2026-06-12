@@ -160,6 +160,7 @@ export default function LoginPage() {
               { role: 'Super Admin',  email: 'admin@educonnect.gn' },
               { role: 'Fondateur',    email: 'fondateur@cec.gn' },
               { role: 'Directrice',   email: 'directrice@cec.gn' },
+              { role: 'Comptable',    email: 'comptable@cec.gn' },
               { role: 'Enseignant',   email: 'enseignant@cec.gn' },
               { role: 'Parent',       email: 'parent@cec.gn' },
               { role: 'Élève',        email: 'eleve@cec.gn' },
