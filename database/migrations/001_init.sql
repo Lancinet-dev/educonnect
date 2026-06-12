@@ -172,34 +172,34 @@ INSERT INTO users (id, school_id, role, first_name, last_name, email, phone, pas
    NULL,
    'super_admin', 'Ibrahima', 'Sow',
    'admin@educonnect.gn', '+224 620 000 001',
-   '$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TiGniLeSmUOVhLXeGxIkFfL7lQ8S'),
+   '$2b$12$bpIqn.t15NWg9uyW0fuYI.VU/lICR9kLGDUIopQZkthTh7vUrj3xi'),
 
   ('00000000-0000-0000-0000-000000000101',
    '00000000-0000-0000-0000-000000000010',
    'founder', 'Mamadou', 'Diallo',
    'fondateur@cec.gn', '+224 622 000 002',
-   '$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TiGniLeSmUOVhLXeGxIkFfL7lQ8S'),
+   '$2b$12$bpIqn.t15NWg9uyW0fuYI.VU/lICR9kLGDUIopQZkthTh7vUrj3xi'),
 
   ('00000000-0000-0000-0000-000000000102',
    '00000000-0000-0000-0000-000000000010',
    'school_admin', 'Fatoumata', 'Camara',
    'directrice@cec.gn', '+224 624 000 003',
-   '$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TiGniLeSmUOVhLXeGxIkFfL7lQ8S'),
+   '$2b$12$bpIqn.t15NWg9uyW0fuYI.VU/lICR9kLGDUIopQZkthTh7vUrj3xi'),
 
   ('00000000-0000-0000-0000-000000000103',
    '00000000-0000-0000-0000-000000000010',
    'teacher', 'Ibrahim', 'Bah',
    'enseignant@cec.gn', '+224 626 000 004',
-   '$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TiGniLeSmUOVhLXeGxIkFfL7lQ8S'),
+   '$2b$12$bpIqn.t15NWg9uyW0fuYI.VU/lICR9kLGDUIopQZkthTh7vUrj3xi'),
 
   ('00000000-0000-0000-0000-000000000104',
    '00000000-0000-0000-0000-000000000010',
    'parent', 'Aissatou', 'Barry',
    'parent@cec.gn', '+224 628 000 005',
-   '$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TiGniLeSmUOVhLXeGxIkFfL7lQ8S'),
+   '$2b$12$bpIqn.t15NWg9uyW0fuYI.VU/lICR9kLGDUIopQZkthTh7vUrj3xi'),
 
   ('00000000-0000-0000-0000-000000000105',
    '00000000-0000-0000-0000-000000000010',
    'student', 'Abdoulaye', 'Barry',
    'eleve@cec.gn', NULL,
-   '$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TiGniLeSmUOVhLXeGxIkFfL7lQ8S');
+   '$2b$12$bpIqn.t15NWg9uyW0fuYI.VU/lICR9kLGDUIopQZkthTh7vUrj3xi');
