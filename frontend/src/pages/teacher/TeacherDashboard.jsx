@@ -1,19 +1,22 @@
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, useNavigate } from 'react-router-dom'
 import {
   BookOpen, Users, CheckCircle2, AlertTriangle,
-  Calendar, GraduationCap, Clock
+  Calendar, GraduationCap, Clock, ClipboardCheck
 } from 'lucide-react'
 import { useTeacherOverview } from '@/hooks/useTeacherData'
 import { useAuth } from '@/hooks/useAuth'
 import StatCard from '@/components/ui/StatCard'
 import Card from '@/components/ui/Card'
 import Badge from '@/components/ui/Badge'
+import Button from '@/components/ui/Button'
 import Spinner from '@/components/ui/Spinner'
 import { formatPercent } from '@/utils/format'
+import TeacherAttendance from './TeacherAttendance'
 
 function Overview() {
   const { data, isLoading, error } = useTeacherOverview()
   const { user } = useAuth()
+  const navigate = useNavigate()
 
   if (isLoading) {
     return <div className="flex items-center justify-center h-96"><Spinner /></div>
@@ -29,13 +32,18 @@ function Overview() {
     <div className="space-y-6 animate-fade-in">
 
       {/* En-tête */}
-      <div>
-        <h1 className="text-2xl font-bold font-display text-surface-900">
-          Bonjour, {user?.first_name} 👋
-        </h1>
-        <p className="text-surface-500 mt-1">
-          {new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
-        </p>
+      <div className="flex items-start justify-between gap-4 flex-wrap">
+        <div>
+          <h1 className="text-2xl font-bold font-display text-surface-900">
+            Bonjour, {user?.first_name} 👋
+          </h1>
+          <p className="text-surface-500 mt-1">
+            {new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
+          </p>
+        </div>
+        <Button size="lg" icon={<ClipboardCheck size={18} />} onClick={() => navigate('/teacher/presences')}>
+          Faire l'appel
+        </Button>
       </div>
 
       {/* Chiffres clés */}
@@ -140,11 +148,15 @@ function Overview() {
                 </div>
                 {c.isMain && <Badge variant="primary">Principal</Badge>}
               </div>
-              <div className="flex items-center gap-2 pt-3 border-t border-surface-100">
-                <Users size={16} className="text-surface-400" />
-                <span className="text-sm text-surface-600">
+              <div className="flex items-center justify-between gap-2 pt-3 border-t border-surface-100">
+                <span className="text-sm text-surface-600 flex items-center gap-2">
+                  <Users size={16} className="text-surface-400" />
                   <span className="font-semibold text-surface-900">{c.students}</span> élève{c.students > 1 ? 's' : ''}
                 </span>
+                <Button variant="secondary" size="sm" icon={<ClipboardCheck size={15} />}
+                  onClick={() => navigate(`/teacher/presences?classId=${c.id}`)}>
+                  Appel
+                </Button>
               </div>
             </Card>
           ))}
@@ -158,6 +170,7 @@ export default function TeacherDashboard() {
   return (
     <Routes>
       <Route index element={<Overview />} />
+      <Route path="presences" element={<TeacherAttendance />} />
     </Routes>
   )
 }

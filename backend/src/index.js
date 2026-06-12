@@ -17,6 +17,7 @@ import parentRoutes from './routes/parent.routes.js'
 import studentRoutes from './routes/student.routes.js'
 import teacherRoutes from './routes/teacher.routes.js'
 import accountantRoutes from './routes/accountant.routes.js'
+import attendanceRoutes from './routes/attendance.routes.js'
 
 const app        = express()
 const httpServer = createServer(app)
@@ -59,6 +60,7 @@ app.use('/api/parent', parentRoutes)
 app.use('/api/student', studentRoutes)
 app.use('/api/teacher', teacherRoutes)
 app.use('/api/accountant', accountantRoutes)
+app.use('/api/attendance', attendanceRoutes)
 
 // Health check
 app.get('/api/health', async (req, res) => {
