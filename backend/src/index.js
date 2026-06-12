@@ -11,6 +11,8 @@ import { pool } from './db/pool.js'
 import { errorHandler } from './middleware/error.middleware.js'
 import authRoutes from './routes/auth.routes.js'
 import directorRoutes from './routes/director.routes.js'
+import founderRoutes from './routes/founder.routes.js'
+import superadminRoutes from './routes/superadmin.routes.js'
 
 const app        = express()
 const httpServer = createServer(app)
@@ -47,6 +49,8 @@ app.use(rateLimit({
 // ── Routes ────────────────────────────────────────────
 app.use('/api/auth', authRoutes)
 app.use('/api/director', directorRoutes)
+app.use('/api/founder', founderRoutes)
+app.use('/api/superadmin', superadminRoutes)
 
 // Health check
 app.get('/api/health', async (req, res) => {
