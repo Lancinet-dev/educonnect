@@ -13,6 +13,8 @@ import authRoutes from './routes/auth.routes.js'
 import directorRoutes from './routes/director.routes.js'
 import founderRoutes from './routes/founder.routes.js'
 import superadminRoutes from './routes/superadmin.routes.js'
+import parentRoutes from './routes/parent.routes.js'
+import studentRoutes from './routes/student.routes.js'
 
 const app        = express()
 const httpServer = createServer(app)
@@ -51,6 +53,8 @@ app.use('/api/auth', authRoutes)
 app.use('/api/director', directorRoutes)
 app.use('/api/founder', founderRoutes)
 app.use('/api/superadmin', superadminRoutes)
+app.use('/api/parent', parentRoutes)
+app.use('/api/student', studentRoutes)
 
 // Health check
 app.get('/api/health', async (req, res) => {
