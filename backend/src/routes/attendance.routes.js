@@ -14,7 +14,7 @@ async function canAccessClass(user, classId) {
   if (!cls) return null
   if (user.role === 'super_admin') return cls
   if (cls.school_id !== user.school_id) return null
-  if (user.role === 'school_admin') return cls
+  if (user.role === 'school_admin' || user.role === 'surveillant') return cls
   if (user.role === 'teacher') {
     const { rows: t } = await query(
       'SELECT 1 FROM class_teachers WHERE class_id = $1 AND teacher_id = $2',
@@ -27,7 +27,7 @@ async function canAccessClass(user, classId) {
 
 // ── GET /api/attendance/classes ───────────────────────────────
 // Classes accessibles à l'utilisateur (pour les sélecteurs)
-router.get('/classes', authenticate, authorize('teacher', 'school_admin', 'super_admin'), async (req, res, next) => {
+router.get('/classes', authenticate, authorize('teacher', 'school_admin', 'surveillant', 'super_admin'), async (req, res, next) => {
   try {
     let rows
     if (req.user.role === 'teacher') {
@@ -62,7 +62,7 @@ router.get('/classes', authenticate, authorize('teacher', 'school_admin', 'super
 
 // ── GET /api/attendance/class/:classId?date=YYYY-MM-DD ────────
 // Élèves de la classe + leur statut pour la date (défaut : aujourd'hui)
-router.get('/class/:classId', authenticate, authorize('teacher', 'school_admin', 'super_admin'), async (req, res, next) => {
+router.get('/class/:classId', authenticate, authorize('teacher', 'school_admin', 'surveillant', 'super_admin'), async (req, res, next) => {
   try {
     const { classId } = req.params
     const date = req.query.date || new Date().toISOString().slice(0, 10)
@@ -112,7 +112,7 @@ router.get('/class/:classId', authenticate, authorize('teacher', 'school_admin',
 
 // ── POST /api/attendance/class/:classId ───────────────────────
 // Enregistre/met à jour l'appel en lot : { date, records: [{studentId, status}] }
-router.post('/class/:classId', authenticate, authorize('teacher', 'school_admin', 'super_admin'), async (req, res, next) => {
+router.post('/class/:classId', authenticate, authorize('teacher', 'school_admin', 'surveillant', 'super_admin'), async (req, res, next) => {
   const client = await pool.connect()
   try {
     const { classId } = req.params
@@ -160,7 +160,7 @@ router.post('/class/:classId', authenticate, authorize('teacher', 'school_admin'
 
 // ── GET /api/attendance/director/stats ────────────────────────
 // Statistiques globales pour le directeur (mois en cours + classement)
-router.get('/director/stats', authenticate, authorize('school_admin', 'super_admin'), async (req, res, next) => {
+router.get('/director/stats', authenticate, authorize('school_admin', 'surveillant', 'super_admin'), async (req, res, next) => {
   try {
     const schoolId = req.user.school_id
 

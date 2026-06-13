@@ -14,6 +14,7 @@ import Card from '@/components/ui/Card'
 import Spinner from '@/components/ui/Spinner'
 import { formatGNF } from '@/utils/format'
 import AccountantPayments from './AccountantPayments'
+import ComingSoon from '@/components/ComingSoon'
 
 const METHOD_LABELS = {
   cash:         'Espèces',
@@ -176,6 +177,8 @@ export default function AccountantDashboard() {
     <Routes>
       <Route index element={<Overview />} />
       <Route path="paiements" element={<AccountantPayments />} />
+      <Route path="depenses" element={<ComingSoon title="Dépenses" note="Le suivi des dépenses de l'école arrivera prochainement." />} />
+      <Route path="rapports" element={<ComingSoon title="Rapports" note="Rapports financiers détaillés à venir." />} />
     </Routes>
   )
 }

@@ -14,6 +14,7 @@ import { formatPercent } from '@/utils/format'
 import TeacherAttendance from './TeacherAttendance'
 import TeacherGrades from './TeacherGrades'
 import TeacherHomework from './TeacherHomework'
+import TeacherClasses from './TeacherClasses'
 import MessagesPage from '@/pages/communication/MessagesPage'
 import AnnouncementsPage from '@/pages/communication/AnnouncementsPage'
 
@@ -185,6 +186,7 @@ export default function TeacherDashboard() {
   return (
     <Routes>
       <Route index element={<Overview />} />
+      <Route path="classes" element={<TeacherClasses />} />
       <Route path="presences" element={<TeacherAttendance />} />
       <Route path="notes" element={<TeacherGrades />} />
       <Route path="devoirs" element={<TeacherHomework />} />

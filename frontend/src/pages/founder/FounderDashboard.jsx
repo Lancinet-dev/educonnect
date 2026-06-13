@@ -15,6 +15,9 @@ import Spinner from '@/components/ui/Spinner'
 import { formatGNF } from '@/utils/format'
 import MessagesPage from '@/pages/communication/MessagesPage'
 import AnnouncementsPage from '@/pages/communication/AnnouncementsPage'
+import FounderSchools from './FounderSchools'
+import FounderFinances from './FounderFinances'
+import ComingSoon from '@/components/ComingSoon'
 
 // ── Vue d'ensemble du réseau ──────────────────────────────────
 function Overview() {
@@ -214,6 +217,9 @@ export default function FounderDashboard() {
   return (
     <Routes>
       <Route index element={<Overview />} />
+      <Route path="ecoles" element={<FounderSchools />} />
+      <Route path="finances" element={<FounderFinances />} />
+      <Route path="rapports" element={<ComingSoon title="Rapports" note="Les rapports consolidés du réseau arriveront prochainement." />} />
       <Route path="messages" element={<MessagesPage />} />
       <Route path="annonces" element={<AnnouncementsPage />} />
     </Routes>

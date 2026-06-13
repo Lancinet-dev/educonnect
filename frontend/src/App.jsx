@@ -14,6 +14,7 @@ import AccountantDashboard from '@/pages/accountant/AccountantDashboard'
 import DirectorDashboard   from '@/pages/director/DirectorDashboard'
 import FounderDashboard    from '@/pages/founder/FounderDashboard'
 import SuperAdminDashboard from '@/pages/superadmin/SuperAdminDashboard'
+import SurveillantDashboard from '@/pages/surveillant/SurveillantDashboard'
 
 // Protection des routes avec layout intégré
 function ProtectedRoute({ children, allowedRoles }) {
@@ -35,6 +36,7 @@ function RoleRedirect() {
     founder:      '/founder',
     school_admin: '/director',
     accountant:   '/accountant',
+    surveillant:  '/surveillant',
     teacher:      '/teacher',
     student:      '/student',
     parent:       '/parent',
@@ -57,6 +59,8 @@ export default function App() {
         element={<ProtectedRoute allowedRoles={['teacher']}><TeacherDashboard /></ProtectedRoute>} />
       <Route path="/accountant/*"
         element={<ProtectedRoute allowedRoles={['accountant']}><AccountantDashboard /></ProtectedRoute>} />
+      <Route path="/surveillant/*"
+        element={<ProtectedRoute allowedRoles={['surveillant']}><SurveillantDashboard /></ProtectedRoute>} />
       <Route path="/director/*"
         element={<ProtectedRoute allowedRoles={['school_admin']}><DirectorDashboard /></ProtectedRoute>} />
       <Route path="/founder/*"

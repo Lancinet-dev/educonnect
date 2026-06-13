@@ -18,6 +18,7 @@ import ParentResults from './ParentResults'
 import ParentPayments from './ParentPayments'
 import ParentHomework from './ParentHomework'
 import { useParentHomework } from '@/hooks/useHomework'
+import { useParentIncidents } from '@/hooks/useIncidents'
 import MessagesPage from '@/pages/communication/MessagesPage'
 import AnnouncementsPage from '@/pages/communication/AnnouncementsPage'
 
@@ -48,6 +49,7 @@ function Overview() {
   const navigate = useNavigate()
   const { data: annData } = useAnnouncements()
   const { data: hwData } = useParentHomework()
+  const { data: incidents } = useParentIncidents()
   const [activeIdx, setActiveIdx] = useState(0)
 
   if (isLoading) {
@@ -184,6 +186,28 @@ function Overview() {
             </div>
             <span className="text-xs text-brand-600 font-medium">Voir le détail →</span>
           </button>
+        )
+      })()}
+
+      {/* Discipline / incidents de l'enfant actif */}
+      {(() => {
+        const childIncidents = (incidents || []).filter(i => i.studentId === child.id)
+        if (childIncidents.length === 0) return null
+        return (
+          <Card>
+            <h3 className="font-semibold text-surface-900 mb-3">Discipline — {child.firstName}</h3>
+            <div className="space-y-2">
+              {childIncidents.slice(0, 4).map(i => (
+                <div key={i.id} className="flex items-center gap-3 p-3 rounded-lg bg-surface-50">
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-surface-900">{i.typeLabel}</p>
+                    {i.description && <p className="text-xs text-surface-500 truncate">{i.description}</p>}
+                  </div>
+                  <span className="text-xs text-surface-400 shrink-0">{new Date(i.date).toLocaleDateString('fr-FR')}</span>
+                </div>
+              ))}
+            </div>
+          </Card>
         )
       })()}
 

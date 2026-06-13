@@ -27,6 +27,7 @@ export function useAuth() {
         founder:      '/founder',
         school_admin: '/director',
         accountant:   '/accountant',
+        surveillant:  '/surveillant',
         teacher:      '/teacher',
         student:      '/student',
         parent:       '/parent',

@@ -8,7 +8,7 @@ import { query } from '../db/pool.js'
 export async function getContacts(user) {
   const { id, role, school_id } = user
 
-  if (['school_admin', 'super_admin', 'accountant', 'founder'].includes(role)) {
+  if (['school_admin', 'super_admin', 'accountant', 'founder', 'surveillant'].includes(role)) {
     const { rows } = await query(
       `SELECT id, first_name, last_name, role, avatar_url
        FROM users

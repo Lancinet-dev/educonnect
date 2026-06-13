@@ -172,6 +172,7 @@ export default function LoginPage() {
               { role: 'Fondateur',    email: 'fondateur@cec.gn' },
               { role: 'Directrice',   email: 'directrice@cec.gn' },
               { role: 'Comptable',    email: 'comptable@cec.gn' },
+              { role: 'Surveillant',  email: 'surveillant@cec.gn' },
               { role: 'Enseignant',   email: 'enseignant@cec.gn' },
               { role: 'Parent',       email: 'parent@cec.gn' },
               { role: 'Élève',        email: 'eleve@cec.gn' },

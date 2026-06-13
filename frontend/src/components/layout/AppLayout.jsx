@@ -4,7 +4,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import {
   LayoutDashboard, Users, BookOpen, ClipboardList,
   MessageSquare, CreditCard, BarChart3, Settings,
-  LogOut, Menu, X, GraduationCap, Megaphone, CalendarDays
+  LogOut, Menu, X, GraduationCap, Megaphone, CalendarDays, ShieldAlert
 } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import { useAuthStore } from '@/store/authStore'
@@ -50,6 +50,7 @@ const MENUS = {
     { label: 'Classes',         icon: BookOpen,         path: '/director/classes' },
     { label: 'Emploi du temps', icon: CalendarDays,     path: '/director/emploi-du-temps' },
     { label: 'Présences',       icon: ClipboardList,    path: '/director/presences' },
+    { label: 'Discipline',      icon: ShieldAlert,      path: '/director/discipline' },
     { label: 'Finances',        icon: CreditCard,       path: '/director/finances' },
     { label: 'Messages',        icon: MessageSquare,    path: '/director/messages' },
     { label: 'Annonces',        icon: Megaphone,        path: '/director/annonces' },
@@ -68,6 +69,12 @@ const MENUS = {
     { label: 'Rapports',        icon: BarChart3,        path: '/founder/rapports' },
     { label: 'Messages',        icon: MessageSquare,    path: '/founder/messages' },
     { label: 'Annonces',        icon: Megaphone,        path: '/founder/annonces' },
+  ],
+  surveillant: [
+    { label: 'Tableau de bord', icon: LayoutDashboard, path: '/surveillant' },
+    { label: 'Présences',       icon: ClipboardList,    path: '/surveillant/presences' },
+    { label: 'Discipline',      icon: ShieldAlert,      path: '/surveillant/discipline' },
+    { label: 'Messages',        icon: MessageSquare,    path: '/surveillant/messages' },
   ],
   super_admin: [
     { label: 'Tableau de bord', icon: LayoutDashboard, path: '/superadmin' },

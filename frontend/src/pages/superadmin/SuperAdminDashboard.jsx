@@ -14,6 +14,7 @@ import Badge from '@/components/ui/Badge'
 import Spinner from '@/components/ui/Spinner'
 import { formatGNF } from '@/utils/format'
 import SuperAdminSchools from './SuperAdminSchools'
+import ComingSoon from '@/components/ComingSoon'
 
 const PLAN_COLORS = { premium: '#6366f1', free: '#cbd5e1' }
 
@@ -193,6 +194,9 @@ export default function SuperAdminDashboard() {
       <Route index element={<Overview />} />
       <Route path="ecoles" element={<SuperAdminSchools />} />
       <Route path="abonnements" element={<SuperAdminSchools />} />
+      <Route path="utilisateurs" element={<ComingSoon title="Utilisateurs" note="La gestion globale des utilisateurs arrivera prochainement." />} />
+      <Route path="statistiques" element={<ComingSoon title="Statistiques" note="Les statistiques avancées de la plateforme arriveront prochainement." />} />
+      <Route path="parametres" element={<ComingSoon title="Paramètres" note="Les paramètres de la plateforme arriveront prochainement." />} />
     </Routes>
   )
 }

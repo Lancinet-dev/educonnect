@@ -26,6 +26,7 @@ import homeworkRoutes from './routes/homework.routes.js'
 import timetableRoutes from './routes/timetable.routes.js'
 import managementRoutes from './routes/management.routes.js'
 import uploadRoutes from './routes/upload.routes.js'
+import incidentRoutes from './routes/incidents.routes.js'
 import { initRealtime } from './realtime.js'
 import { initCloudinary } from './config/cloudinary.js'
 
@@ -70,6 +71,7 @@ app.use('/api/homework', homeworkRoutes)
 app.use('/api/timetable', timetableRoutes)
 app.use('/api/management', managementRoutes)
 app.use('/api/upload', uploadRoutes)
+app.use('/api/incidents', incidentRoutes)
 
 // Health check
 app.get('/api/health', async (req, res) => {

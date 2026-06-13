@@ -23,6 +23,8 @@ import DirectorStaff from './DirectorStaff'
 import DirectorClasses from './DirectorClasses'
 import MessagesPage from '@/pages/communication/MessagesPage'
 import AnnouncementsPage from '@/pages/communication/AnnouncementsPage'
+import DisciplinePage from '@/pages/shared/DisciplinePage'
+import ComingSoon from '@/components/ComingSoon'
 
 // ── Page principale : vue d'ensemble ──────────────────────────
 function Overview() {
@@ -256,7 +258,9 @@ export default function DirectorDashboard() {
       <Route path="personnel" element={<DirectorStaff />} />
       <Route path="classes" element={<DirectorClasses />} />
       <Route path="presences" element={<DirectorAttendance />} />
+      <Route path="discipline" element={<DisciplinePage />} />
       <Route path="finances" element={<DirectorFinances />} />
+      <Route path="rapports" element={<ComingSoon title="Rapports" note="Bulletins de classe et exports avancés à venir." />} />
       <Route path="emploi-du-temps" element={<DirectorTimetable />} />
       <Route path="messages" element={<MessagesPage />} />
       <Route path="annonces" element={<AnnouncementsPage />} />
