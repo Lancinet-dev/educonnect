@@ -32,6 +32,7 @@ function AcademicReport() {
       </div>
 
       <Card padding={false}>
+        <div className="overflow-x-auto"><div className="min-w-[480px]">
         <div className="grid grid-cols-12 px-4 py-2 border-b border-surface-100 text-xs font-medium text-surface-500">
           <span className="col-span-5">Classe</span><span className="col-span-3 text-right">Moyenne</span>
           <span className="col-span-3 text-right">Réussite</span><span className="col-span-1 text-right">Élèves</span>
@@ -49,6 +50,7 @@ function AcademicReport() {
           </div>
         ))}
         {data.classes.length === 0 && <p className="text-center text-surface-500 text-sm py-8">Aucune donnée.</p>}
+        </div></div>
       </Card>
     </div>
   )

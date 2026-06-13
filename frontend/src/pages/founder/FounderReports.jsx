@@ -57,6 +57,7 @@ export default function FounderReports() {
           </Card>
 
           <Card padding={false}>
+            <div className="overflow-x-auto"><div className="min-w-[620px]">
             <div className="grid grid-cols-12 px-4 py-2 border-b border-surface-100 text-xs font-medium text-surface-500">
               <span className="col-span-4">École</span>
               <span className="col-span-2 text-right">Recettes</span>
@@ -78,6 +79,7 @@ export default function FounderReports() {
                 </span>
               </div>
             ))}
+            </div></div>
           </Card>
         </>
       )}
