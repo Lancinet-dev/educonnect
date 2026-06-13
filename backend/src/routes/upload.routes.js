@@ -58,4 +58,18 @@ router.post('/homework', authorize('teacher', 'school_admin', 'super_admin'),
     } catch (err) { next(err) }
   })
 
+// ── POST /api/upload/document  (justificatif générique) ──────
+// Accessible à tout utilisateur authentifié (reçus de dépense, etc.)
+router.post('/document', requireCloudinary, upload.single('file'), async (req, res, next) => {
+  try {
+    if (!req.file) return res.status(400).json({ error: 'Aucun fichier fourni.' })
+    const isImage = req.file.mimetype.startsWith('image/')
+    const result = await uploadBuffer(req.file.buffer, {
+      folder: 'educonnect/documents',
+      resource_type: isImage ? 'image' : 'raw',
+    })
+    res.json({ url: result.secure_url, name: req.file.originalname })
+  } catch (err) { next(err) }
+})
+
 export default router

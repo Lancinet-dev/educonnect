@@ -22,7 +22,10 @@ router.get('/overview', async (req, res, next) => {
          (SELECT COALESCE(SUM(amount_due), 0)  FROM fee_invoices WHERE school_id = $1) AS total_due,
          (SELECT COALESCE(SUM(amount_paid), 0) FROM fee_invoices WHERE school_id = $1) AS total_paid,
          (SELECT COUNT(*) FROM fee_invoices
-            WHERE school_id = $1 AND status IN ('pending','partial','overdue')) AS invoices_unpaid`,
+            WHERE school_id = $1 AND status IN ('pending','partial','overdue')) AS invoices_unpaid,
+         (SELECT COALESCE(SUM(amount), 0) FROM expenses
+            WHERE school_id = $1
+              AND date_trunc('month', date) = date_trunc('month', CURRENT_DATE)) AS expenses_month`,
       [schoolId]
     )
 
@@ -69,12 +72,14 @@ router.get('/overview', async (req, res, next) => {
 
     res.json({
       finances: {
-        revenueThisMonth: parseFloat(stats.revenue_month),
-        revenueTotal:     parseFloat(stats.revenue_total),
+        revenueThisMonth:  parseFloat(stats.revenue_month),
+        revenueTotal:      parseFloat(stats.revenue_total),
+        expensesThisMonth: parseFloat(stats.expenses_month),
+        netBalance:        parseFloat(stats.revenue_month) - parseFloat(stats.expenses_month),
         totalDue,
         totalPaid,
-        totalUnpaid:      unpaid,
-        invoicesUnpaid:   parseInt(stats.invoices_unpaid),
+        totalUnpaid:       unpaid,
+        invoicesUnpaid:    parseInt(stats.invoices_unpaid),
         collectionRate,
       },
       paymentMethods: methods.map(m => ({

@@ -52,3 +52,7 @@ export async function uploadAvatar(file) {
 export async function uploadHomeworkFile(file) {
   return uploadFile('/upload/homework', file) // { url, name }
 }
+
+export async function uploadDocument(file) {
+  return uploadFile('/upload/document', file) // { url, name }
+}

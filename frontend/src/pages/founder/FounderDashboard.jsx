@@ -17,7 +17,7 @@ import MessagesPage from '@/pages/communication/MessagesPage'
 import AnnouncementsPage from '@/pages/communication/AnnouncementsPage'
 import FounderSchools from './FounderSchools'
 import FounderFinances from './FounderFinances'
-import ComingSoon from '@/components/ComingSoon'
+import FounderReports from './FounderReports'
 
 // ── Vue d'ensemble du réseau ──────────────────────────────────
 function Overview() {
@@ -219,7 +219,7 @@ export default function FounderDashboard() {
       <Route index element={<Overview />} />
       <Route path="ecoles" element={<FounderSchools />} />
       <Route path="finances" element={<FounderFinances />} />
-      <Route path="rapports" element={<ComingSoon title="Rapports" note="Les rapports consolidés du réseau arriveront prochainement." />} />
+      <Route path="rapports" element={<FounderReports />} />
       <Route path="messages" element={<MessagesPage />} />
       <Route path="annonces" element={<AnnouncementsPage />} />
     </Routes>

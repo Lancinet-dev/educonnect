@@ -1,6 +1,6 @@
 import { Routes, Route } from 'react-router-dom'
 import {
-  Wallet, TrendingUp, AlertTriangle, Percent,
+  Wallet, TrendingUp, TrendingDown, AlertTriangle, Percent, Scale,
   CreditCard, ArrowDownCircle
 } from 'lucide-react'
 import {
@@ -14,7 +14,8 @@ import Card from '@/components/ui/Card'
 import Spinner from '@/components/ui/Spinner'
 import { formatGNF } from '@/utils/format'
 import AccountantPayments from './AccountantPayments'
-import ComingSoon from '@/components/ComingSoon'
+import AccountantExpenses from './AccountantExpenses'
+import AccountantReports from './AccountantReports'
 
 const METHOD_LABELS = {
   cash:         'Espèces',
@@ -61,8 +62,9 @@ function Overview() {
       {/* Indicateurs clés */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard label="Recettes ce mois"   value={formatGNF(finances.revenueThisMonth)} icon={Wallet}       color="green" />
-        <StatCard label="Total encaissé"     value={formatGNF(finances.totalPaid)}        icon={TrendingUp}   color="brand" />
-        <StatCard label="Impayés"            value={formatGNF(finances.totalUnpaid)}      icon={AlertTriangle} color="red" />
+        <StatCard label="Dépenses ce mois"   value={formatGNF(finances.expensesThisMonth ?? 0)} icon={TrendingDown} color="red" />
+        <StatCard label="Solde net du mois"  value={formatGNF(finances.netBalance ?? finances.revenueThisMonth)}
+          icon={Scale} color={(finances.netBalance ?? 0) >= 0 ? 'brand' : 'amber'} />
         <StatCard label="Taux de recouvrement" value={`${finances.collectionRate}%`}     icon={Percent}      color="purple" />
       </div>
 
@@ -177,8 +179,8 @@ export default function AccountantDashboard() {
     <Routes>
       <Route index element={<Overview />} />
       <Route path="paiements" element={<AccountantPayments />} />
-      <Route path="depenses" element={<ComingSoon title="Dépenses" note="Le suivi des dépenses de l'école arrivera prochainement." />} />
-      <Route path="rapports" element={<ComingSoon title="Rapports" note="Rapports financiers détaillés à venir." />} />
+      <Route path="depenses" element={<AccountantExpenses />} />
+      <Route path="rapports" element={<AccountantReports />} />
     </Routes>
   )
 }
