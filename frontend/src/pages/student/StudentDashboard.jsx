@@ -12,6 +12,8 @@ import Button from '@/components/ui/Button'
 import Spinner from '@/components/ui/Spinner'
 import { formatGNF } from '@/utils/format'
 import StudentGrades from './StudentGrades'
+import MessagesPage from '@/pages/communication/MessagesPage'
+import AnnouncementsPage from '@/pages/communication/AnnouncementsPage'
 
 const ATTENDANCE = {
   present: { label: 'Présent(e)',      icon: CheckCircle2, bg: 'bg-emerald-50', text: 'text-emerald-700', ring: 'border-emerald-200' },
@@ -200,6 +202,8 @@ export default function StudentDashboard() {
     <Routes>
       <Route index element={<Overview />} />
       <Route path="notes" element={<StudentGrades />} />
+      <Route path="messages" element={<MessagesPage />} />
+      <Route path="annonces" element={<AnnouncementsPage />} />
     </Routes>
   )
 }

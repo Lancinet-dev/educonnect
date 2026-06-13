@@ -13,6 +13,8 @@ import Card from '@/components/ui/Card'
 import Badge from '@/components/ui/Badge'
 import Spinner from '@/components/ui/Spinner'
 import { formatGNF } from '@/utils/format'
+import MessagesPage from '@/pages/communication/MessagesPage'
+import AnnouncementsPage from '@/pages/communication/AnnouncementsPage'
 
 // ── Vue d'ensemble du réseau ──────────────────────────────────
 function Overview() {
@@ -212,6 +214,8 @@ export default function FounderDashboard() {
   return (
     <Routes>
       <Route index element={<Overview />} />
+      <Route path="messages" element={<MessagesPage />} />
+      <Route path="annonces" element={<AnnouncementsPage />} />
     </Routes>
   )
 }

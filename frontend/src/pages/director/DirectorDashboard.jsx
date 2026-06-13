@@ -16,6 +16,8 @@ import Spinner from '@/components/ui/Spinner'
 import { formatGNF, formatPercent } from '@/utils/format'
 import { useAuth } from '@/hooks/useAuth'
 import DirectorAttendance from './DirectorAttendance'
+import MessagesPage from '@/pages/communication/MessagesPage'
+import AnnouncementsPage from '@/pages/communication/AnnouncementsPage'
 
 // ── Page principale : vue d'ensemble ──────────────────────────
 function Overview() {
@@ -246,6 +248,8 @@ export default function DirectorDashboard() {
     <Routes>
       <Route index element={<Overview />} />
       <Route path="presences" element={<DirectorAttendance />} />
+      <Route path="messages" element={<MessagesPage />} />
+      <Route path="annonces" element={<AnnouncementsPage />} />
       {/* Les autres sous-routes (élèves, personnel, classes, finances...)
           seront ajoutées dans les prochaines instructions */}
     </Routes>

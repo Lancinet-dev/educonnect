@@ -4,7 +4,9 @@ import {
   CheckCircle2, XCircle, Clock, HelpCircle,
   Wallet, Award, Bell, CreditCard, GraduationCap
 } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
 import { useParentOverview } from '@/hooks/useParentData'
+import { useAnnouncements } from '@/hooks/useAnnouncements'
 import { useAuth } from '@/hooks/useAuth'
 import Card from '@/components/ui/Card'
 import Badge from '@/components/ui/Badge'
@@ -13,6 +15,8 @@ import Spinner from '@/components/ui/Spinner'
 import { formatGNF } from '@/utils/format'
 import ParentAttendance from './ParentAttendance'
 import ParentResults from './ParentResults'
+import MessagesPage from '@/pages/communication/MessagesPage'
+import AnnouncementsPage from '@/pages/communication/AnnouncementsPage'
 
 // ── Affichage du statut de présence (gros bloc coloré) ────────
 const ATTENDANCE = {
@@ -38,6 +42,8 @@ function AttendanceBlock({ status }) {
 function Overview() {
   const { data, isLoading, error } = useParentOverview()
   const { user } = useAuth()
+  const navigate = useNavigate()
+  const { data: annData } = useAnnouncements()
   const [activeIdx, setActiveIdx] = useState(0)
 
   if (isLoading) {
@@ -185,24 +191,32 @@ function Overview() {
           )}
         </Card>
 
-        {/* Messages de l'école */}
+        {/* Annonces de l'école */}
         <Card>
           <div className="flex items-center justify-between mb-4">
-            <h3 className="font-semibold text-surface-900">Messages de l'école</h3>
-            <Bell size={16} className="text-surface-400" />
+            <h3 className="font-semibold text-surface-900">Annonces de l'école</h3>
+            <button onClick={() => navigate('/parent/annonces')} className="text-xs text-brand-600 hover:text-brand-700 font-medium">
+              Tout voir
+            </button>
           </div>
-          {data.messages.length === 0 ? (
+          {!annData || annData.announcements.length === 0 ? (
             <div className="text-center py-6">
               <Bell size={28} className="text-surface-300 mx-auto mb-2" />
-              <p className="text-sm text-surface-500">Aucun message récent</p>
+              <p className="text-sm text-surface-500">Aucune annonce récente</p>
             </div>
           ) : (
             <div className="space-y-2">
-              {data.messages.map((m) => (
-                <div key={m.id} className="p-3 rounded-lg bg-surface-50">
-                  <p className="text-sm font-medium text-surface-900">{m.title}</p>
-                  <p className="text-xs text-surface-500 mt-0.5">{m.body}</p>
-                </div>
+              {annData.announcements.slice(0, 4).map((a) => (
+                <button key={a.id} onClick={() => navigate('/parent/annonces')}
+                  className="w-full text-left p-3 rounded-lg bg-surface-50 hover:bg-surface-100 transition-colors">
+                  <div className="flex items-center gap-2">
+                    {a.priority === 'urgent' && <span className="w-2 h-2 rounded-full bg-red-500 shrink-0" />}
+                    {a.priority === 'important' && <span className="w-2 h-2 rounded-full bg-amber-500 shrink-0" />}
+                    <p className="text-sm font-medium text-surface-900 truncate">{a.title}</p>
+                    {!a.isRead && <Badge variant="primary" className="ml-auto shrink-0">Nouveau</Badge>}
+                  </div>
+                  <p className="text-xs text-surface-500 mt-0.5 line-clamp-1">{a.body}</p>
+                </button>
               ))}
             </div>
           )}
@@ -218,6 +232,8 @@ export default function ParentDashboard() {
       <Route index element={<Overview />} />
       <Route path="presences" element={<ParentAttendance />} />
       <Route path="resultats" element={<ParentResults />} />
+      <Route path="messages" element={<MessagesPage />} />
+      <Route path="annonces" element={<AnnouncementsPage />} />
     </Routes>
   )
 }

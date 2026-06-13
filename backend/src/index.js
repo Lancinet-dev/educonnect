@@ -1,7 +1,6 @@
 import 'dotenv/config'
 import express from 'express'
 import { createServer } from 'http'
-import { Server } from 'socket.io'
 import cors from 'cors'
 import helmet from 'helmet'
 import morgan from 'morgan'
@@ -19,24 +18,16 @@ import teacherRoutes from './routes/teacher.routes.js'
 import accountantRoutes from './routes/accountant.routes.js'
 import attendanceRoutes from './routes/attendance.routes.js'
 import gradesRoutes from './routes/grades.routes.js'
+import messagesRoutes from './routes/messages.routes.js'
+import announcementRoutes from './routes/announcements.routes.js'
+import notificationRoutes from './routes/notifications.routes.js'
+import { initRealtime } from './realtime.js'
 
 const app        = express()
 const httpServer = createServer(app)
 
-// ── Socket.IO ──────────────────────────────────────────
-export const io = new Server(httpServer, {
-  cors: {
-    origin:      process.env.FRONTEND_URL,
-    credentials: true,
-  },
-})
-
-io.on('connection', (socket) => {
-  console.log(`🔌 Socket connecté : ${socket.id}`)
-  socket.on('disconnect', () => {
-    console.log(`❌ Socket déconnecté : ${socket.id}`)
-  })
-})
+// ── Socket.IO (authentifié, rooms par utilisateur) ─────
+initRealtime(httpServer)
 
 // ── Middlewares Express ────────────────────────────────
 app.use(helmet())
@@ -63,6 +54,9 @@ app.use('/api/teacher', teacherRoutes)
 app.use('/api/accountant', accountantRoutes)
 app.use('/api/attendance', attendanceRoutes)
 app.use('/api/grades', gradesRoutes)
+app.use('/api/messages', messagesRoutes)
+app.use('/api/announcements', announcementRoutes)
+app.use('/api/notifications', notificationRoutes)
 
 // Health check
 app.get('/api/health', async (req, res) => {

@@ -1,13 +1,17 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
+import { useQueryClient } from '@tanstack/react-query'
 import {
   LayoutDashboard, Users, BookOpen, ClipboardList,
   MessageSquare, CreditCard, BarChart3, Settings,
-  Bell, LogOut, Menu, X, GraduationCap
+  LogOut, Menu, X, GraduationCap, Megaphone
 } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
+import { useAuthStore } from '@/store/authStore'
+import { connectSocket, disconnectSocket } from '@/services/socket'
 import Avatar from '@/components/ui/Avatar'
 import Badge from '@/components/ui/Badge'
+import NotificationBell from './NotificationBell'
 import { clsx } from 'clsx'
 
 const MENUS = {
@@ -17,6 +21,7 @@ const MENUS = {
     { label: 'Présences',       icon: ClipboardList,    path: '/parent/presences' },
     { label: 'Paiements',       icon: CreditCard,       path: '/parent/paiements' },
     { label: 'Messages',        icon: MessageSquare,    path: '/parent/messages' },
+    { label: 'Annonces',        icon: Megaphone,        path: '/parent/annonces' },
   ],
   student: [
     { label: 'Tableau de bord', icon: LayoutDashboard, path: '/student' },
@@ -24,6 +29,7 @@ const MENUS = {
     { label: 'Devoirs',         icon: ClipboardList,    path: '/student/devoirs' },
     { label: 'Emploi du temps', icon: BarChart3,        path: '/student/emploi-du-temps' },
     { label: 'Messages',        icon: MessageSquare,    path: '/student/messages' },
+    { label: 'Annonces',        icon: Megaphone,        path: '/student/annonces' },
   ],
   teacher: [
     { label: 'Tableau de bord', icon: LayoutDashboard, path: '/teacher' },
@@ -31,14 +37,17 @@ const MENUS = {
     { label: 'Présences',       icon: ClipboardList,    path: '/teacher/presences' },
     { label: 'Notes',           icon: BookOpen,         path: '/teacher/notes' },
     { label: 'Messages',        icon: MessageSquare,    path: '/teacher/messages' },
+    { label: 'Annonces',        icon: Megaphone,        path: '/teacher/annonces' },
   ],
   school_admin: [
     { label: 'Tableau de bord', icon: LayoutDashboard, path: '/director' },
     { label: 'Élèves',          icon: Users,            path: '/director/eleves' },
     { label: 'Personnel',       icon: Users,            path: '/director/personnel' },
     { label: 'Classes',         icon: BookOpen,         path: '/director/classes' },
+    { label: 'Présences',       icon: ClipboardList,    path: '/director/presences' },
     { label: 'Finances',        icon: CreditCard,       path: '/director/finances' },
     { label: 'Messages',        icon: MessageSquare,    path: '/director/messages' },
+    { label: 'Annonces',        icon: Megaphone,        path: '/director/annonces' },
     { label: 'Rapports',        icon: BarChart3,        path: '/director/rapports' },
   ],
   accountant: [
@@ -53,6 +62,7 @@ const MENUS = {
     { label: 'Finances',        icon: CreditCard,       path: '/founder/finances' },
     { label: 'Rapports',        icon: BarChart3,        path: '/founder/rapports' },
     { label: 'Messages',        icon: MessageSquare,    path: '/founder/messages' },
+    { label: 'Annonces',        icon: Megaphone,        path: '/founder/annonces' },
   ],
   super_admin: [
     { label: 'Tableau de bord', icon: LayoutDashboard, path: '/superadmin' },
@@ -79,10 +89,39 @@ export default function AppLayout({ children }) {
   const { user, fullName, role, logout } = useAuth()
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const navigate = useNavigate()
+  const qc = useQueryClient()
 
   const menuItems = MENUS[role] || []
 
+  // Connexion temps réel (Socket.IO) + rafraîchissement des données à la réception
+  useEffect(() => {
+    const token = useAuthStore.getState().accessToken
+    if (!token) return
+    const s = connectSocket(token)
+
+    const refreshNotif = () => qc.invalidateQueries({ queryKey: ['notifications'] })
+    const onMessage = () => {
+      qc.invalidateQueries({ queryKey: ['notifications'] })
+      qc.invalidateQueries({ queryKey: ['conversations'] })
+      qc.invalidateQueries({ queryKey: ['conversation'] })
+    }
+    const onAnnouncement = () => {
+      qc.invalidateQueries({ queryKey: ['notifications'] })
+      qc.invalidateQueries({ queryKey: ['announcements'] })
+    }
+    s.on('notification', refreshNotif)
+    s.on('message:new', onMessage)
+    s.on('announcement:new', onAnnouncement)
+
+    return () => {
+      s.off('notification', refreshNotif)
+      s.off('message:new', onMessage)
+      s.off('announcement:new', onAnnouncement)
+    }
+  }, [qc])
+
   const handleLogout = async () => {
+    disconnectSocket()
     await logout()
     navigate('/login')
   }
@@ -196,11 +235,7 @@ export default function AppLayout({ children }) {
           <div className="flex-1" />
 
           {/* Notifications */}
-          <button className="relative text-surface-500 hover:text-surface-700 transition-colors">
-            <Bell size={20} />
-            <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-brand-500
-                             rounded-full border border-white" />
-          </button>
+          <NotificationBell role={role} />
 
           {/* Badge plan */}
           {user?.school_plan && (
