@@ -19,6 +19,7 @@ const MENUS = {
     { label: 'Tableau de bord', icon: LayoutDashboard, path: '/parent' },
     { label: 'Résultats',       icon: BookOpen,         path: '/parent/resultats' },
     { label: 'Présences',       icon: ClipboardList,    path: '/parent/presences' },
+    { label: 'Devoirs',         icon: ClipboardList,    path: '/parent/devoirs' },
     { label: 'Paiements',       icon: CreditCard,       path: '/parent/paiements' },
     { label: 'Messages',        icon: MessageSquare,    path: '/parent/messages' },
     { label: 'Annonces',        icon: Megaphone,        path: '/parent/annonces' },
@@ -36,6 +37,7 @@ const MENUS = {
     { label: 'Mes classes',     icon: Users,            path: '/teacher/classes' },
     { label: 'Présences',       icon: ClipboardList,    path: '/teacher/presences' },
     { label: 'Notes',           icon: BookOpen,         path: '/teacher/notes' },
+    { label: 'Devoirs',         icon: ClipboardList,    path: '/teacher/devoirs' },
     { label: 'Messages',        icon: MessageSquare,    path: '/teacher/messages' },
     { label: 'Annonces',        icon: Megaphone,        path: '/teacher/annonces' },
   ],
@@ -109,14 +111,20 @@ export default function AppLayout({ children }) {
       qc.invalidateQueries({ queryKey: ['notifications'] })
       qc.invalidateQueries({ queryKey: ['announcements'] })
     }
+    const onHomework = () => {
+      qc.invalidateQueries({ queryKey: ['notifications'] })
+      qc.invalidateQueries({ queryKey: ['homework'] })
+    }
     s.on('notification', refreshNotif)
     s.on('message:new', onMessage)
     s.on('announcement:new', onAnnouncement)
+    s.on('homework:new', onHomework)
 
     return () => {
       s.off('notification', refreshNotif)
       s.off('message:new', onMessage)
       s.off('announcement:new', onAnnouncement)
+      s.off('homework:new', onHomework)
     }
   }, [qc])
 

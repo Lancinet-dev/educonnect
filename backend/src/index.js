@@ -22,6 +22,7 @@ import messagesRoutes from './routes/messages.routes.js'
 import announcementRoutes from './routes/announcements.routes.js'
 import notificationRoutes from './routes/notifications.routes.js'
 import financeRoutes from './routes/finance.routes.js'
+import homeworkRoutes from './routes/homework.routes.js'
 import { initRealtime } from './realtime.js'
 
 const app        = express()
@@ -59,6 +60,7 @@ app.use('/api/messages', messagesRoutes)
 app.use('/api/announcements', announcementRoutes)
 app.use('/api/notifications', notificationRoutes)
 app.use('/api/finance', financeRoutes)
+app.use('/api/homework', homeworkRoutes)
 
 // Health check
 app.get('/api/health', async (req, res) => {

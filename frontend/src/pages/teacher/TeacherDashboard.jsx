@@ -1,7 +1,7 @@
 import { Routes, Route, useNavigate } from 'react-router-dom'
 import {
   BookOpen, Users, CheckCircle2, AlertTriangle,
-  Calendar, GraduationCap, Clock, ClipboardCheck, PlusCircle, MessageSquare
+  Calendar, GraduationCap, Clock, ClipboardCheck, PlusCircle, MessageSquare, ClipboardList
 } from 'lucide-react'
 import { useTeacherOverview } from '@/hooks/useTeacherData'
 import { useAuth } from '@/hooks/useAuth'
@@ -13,6 +13,7 @@ import Spinner from '@/components/ui/Spinner'
 import { formatPercent } from '@/utils/format'
 import TeacherAttendance from './TeacherAttendance'
 import TeacherGrades from './TeacherGrades'
+import TeacherHomework from './TeacherHomework'
 import MessagesPage from '@/pages/communication/MessagesPage'
 import AnnouncementsPage from '@/pages/communication/AnnouncementsPage'
 
@@ -50,6 +51,9 @@ function Overview() {
           </Button>
           <Button variant="secondary" size="lg" icon={<PlusCircle size={18} />} onClick={() => navigate('/teacher/notes?new=1')}>
             Ajouter une note
+          </Button>
+          <Button variant="secondary" size="lg" icon={<ClipboardList size={18} />} onClick={() => navigate('/teacher/devoirs?new=1')}>
+            Donner un devoir
           </Button>
           <Button size="lg" icon={<ClipboardCheck size={18} />} onClick={() => navigate('/teacher/presences')}>
             Faire l'appel
@@ -183,6 +187,7 @@ export default function TeacherDashboard() {
       <Route index element={<Overview />} />
       <Route path="presences" element={<TeacherAttendance />} />
       <Route path="notes" element={<TeacherGrades />} />
+      <Route path="devoirs" element={<TeacherHomework />} />
       <Route path="messages" element={<MessagesPage />} />
       <Route path="annonces" element={<AnnouncementsPage />} />
     </Routes>

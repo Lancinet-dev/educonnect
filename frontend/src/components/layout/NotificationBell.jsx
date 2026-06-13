@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Bell, MessageSquare, Megaphone } from 'lucide-react'
+import { Bell, MessageSquare, Megaphone, ClipboardList } from 'lucide-react'
 import { useNotifications } from '@/hooks/useNotifications'
 
 const ROLE_BASE = {
@@ -34,6 +34,7 @@ export default function NotificationBell({ role }) {
   const goTo = (item) => {
     setOpen(false)
     if (item.type === 'message') navigate(`${base}/messages?c=${item.conversationId}`)
+    else if (item.type === 'homework') navigate(`${base}/devoirs`)
     else navigate(`${base}/annonces`)
   }
 
@@ -62,8 +63,10 @@ export default function NotificationBell({ role }) {
                 className={`w-full flex items-start gap-3 p-3 text-left hover:bg-surface-50 border-b border-surface-50 ${
                   !item.read ? 'bg-brand-50/40' : ''}`}>
                 <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
-                  item.type === 'message' ? 'bg-blue-50 text-blue-600' : 'bg-amber-50 text-amber-600'}`}>
-                  {item.type === 'message' ? <MessageSquare size={16} /> : <Megaphone size={16} />}
+                  item.type === 'message' ? 'bg-blue-50 text-blue-600'
+                    : item.type === 'homework' ? 'bg-violet-50 text-violet-600' : 'bg-amber-50 text-amber-600'}`}>
+                  {item.type === 'message' ? <MessageSquare size={16} />
+                    : item.type === 'homework' ? <ClipboardList size={16} /> : <Megaphone size={16} />}
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-surface-900 truncate">{item.title}</p>

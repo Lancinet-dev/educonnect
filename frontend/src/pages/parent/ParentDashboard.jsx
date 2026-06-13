@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Routes, Route } from 'react-router-dom'
 import {
   CheckCircle2, XCircle, Clock, HelpCircle,
-  Wallet, Award, Bell, CreditCard, GraduationCap
+  Wallet, Award, Bell, CreditCard, GraduationCap, ClipboardList
 } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { useParentOverview } from '@/hooks/useParentData'
@@ -16,6 +16,8 @@ import { formatGNF } from '@/utils/format'
 import ParentAttendance from './ParentAttendance'
 import ParentResults from './ParentResults'
 import ParentPayments from './ParentPayments'
+import ParentHomework from './ParentHomework'
+import { useParentHomework } from '@/hooks/useHomework'
 import MessagesPage from '@/pages/communication/MessagesPage'
 import AnnouncementsPage from '@/pages/communication/AnnouncementsPage'
 
@@ -45,6 +47,7 @@ function Overview() {
   const { user } = useAuth()
   const navigate = useNavigate()
   const { data: annData } = useAnnouncements()
+  const { data: hwData } = useParentHomework()
   const [activeIdx, setActiveIdx] = useState(0)
 
   if (isLoading) {
@@ -164,6 +167,26 @@ function Overview() {
         </div>
       </div>
 
+      {/* Résumé devoirs de l'enfant */}
+      {(() => {
+        const hwChild = hwData?.children?.find(c => c.id === child.id)
+        if (!hwChild) return null
+        return (
+          <button onClick={() => navigate('/parent/devoirs')}
+            className="w-full flex items-center gap-4 p-4 rounded-2xl border border-surface-200 bg-white hover:border-brand-300 transition-all text-left">
+            <ClipboardList size={24} className="text-brand-600 shrink-0" />
+            <div className="flex-1">
+              <p className="text-sm font-semibold text-surface-900">Devoirs</p>
+              <p className="text-xs text-surface-500">
+                <span className="font-medium text-surface-700">{hwChild.pendingCount}</span> en cours
+                {hwChild.overdueCount > 0 && <span className="text-red-600 font-medium"> · {hwChild.overdueCount} en retard</span>}
+              </p>
+            </div>
+            <span className="text-xs text-brand-600 font-medium">Voir le détail →</span>
+          </button>
+        )
+      })()}
+
       {/* Paiements récents + Messages */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
 
@@ -234,6 +257,7 @@ export default function ParentDashboard() {
       <Route path="presences" element={<ParentAttendance />} />
       <Route path="resultats" element={<ParentResults />} />
       <Route path="paiements" element={<ParentPayments />} />
+      <Route path="devoirs" element={<ParentHomework />} />
       <Route path="messages" element={<MessagesPage />} />
       <Route path="annonces" element={<AnnouncementsPage />} />
     </Routes>

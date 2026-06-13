@@ -12,8 +12,10 @@ import Button from '@/components/ui/Button'
 import Spinner from '@/components/ui/Spinner'
 import { formatGNF } from '@/utils/format'
 import StudentGrades from './StudentGrades'
+import StudentHomework from './StudentHomework'
 import MessagesPage from '@/pages/communication/MessagesPage'
 import AnnouncementsPage from '@/pages/communication/AnnouncementsPage'
+import { useStudentHomework } from '@/hooks/useHomework'
 
 const ATTENDANCE = {
   present: { label: 'Présent(e)',      icon: CheckCircle2, bg: 'bg-emerald-50', text: 'text-emerald-700', ring: 'border-emerald-200' },
@@ -27,6 +29,7 @@ function Overview() {
   const { data, isLoading, error } = useStudentOverview()
   const { user, fullName } = useAuth()
   const navigate = useNavigate()
+  const { data: hw } = useStudentHomework()
 
   if (isLoading) {
     return <div className="flex items-center justify-center h-96"><Spinner /></div>
@@ -140,21 +143,30 @@ function Overview() {
         {/* Devoirs */}
         <Card>
           <div className="flex items-center justify-between mb-4">
-            <h3 className="font-semibold text-surface-900">Mes devoirs</h3>
-            <ClipboardList size={16} className="text-surface-400" />
+            <h3 className="font-semibold text-surface-900">Mes devoirs à faire</h3>
+            <button onClick={() => navigate('/student/devoirs')} className="text-xs text-brand-600 hover:text-brand-700 font-medium">
+              Tout voir
+            </button>
           </div>
-          {homework.length === 0 ? (
+          {!hw || hw.todo.length === 0 ? (
             <div className="text-center py-8">
               <ClipboardList size={28} className="text-surface-300 mx-auto mb-2" />
-              <p className="text-sm text-surface-500">Aucun devoir pour le moment</p>
+              <p className="text-sm text-surface-500">Aucun devoir à faire 🎉</p>
             </div>
           ) : (
             <div className="space-y-2">
-              {homework.map((h) => (
-                <div key={h.id} className="p-3 rounded-lg bg-surface-50">
-                  <p className="text-sm font-medium text-surface-900">{h.title}</p>
-                  <p className="text-xs text-surface-500 mt-0.5">{h.subject}</p>
-                </div>
+              {hw.todo.slice(0, 5).map((h) => (
+                <button key={h.id} onClick={() => navigate('/student/devoirs')}
+                  className="w-full text-left p-3 rounded-lg bg-surface-50 hover:bg-surface-100 transition-colors">
+                  <div className="flex items-center gap-2">
+                    <span className="w-1.5 h-7 rounded-full shrink-0" style={{ background: h.color || '#6366f1' }} />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-surface-900 truncate">{h.title}</p>
+                      <p className="text-xs text-surface-500">{h.subject || 'Sans matière'} · {new Date(h.dueDate).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })}</p>
+                    </div>
+                    {h.overdue && <span className="text-[10px] font-semibold text-red-600 shrink-0">En retard</span>}
+                  </div>
+                </button>
               ))}
             </div>
           )}
@@ -202,6 +214,7 @@ export default function StudentDashboard() {
     <Routes>
       <Route index element={<Overview />} />
       <Route path="notes" element={<StudentGrades />} />
+      <Route path="devoirs" element={<StudentHomework />} />
       <Route path="messages" element={<MessagesPage />} />
       <Route path="annonces" element={<AnnouncementsPage />} />
     </Routes>
