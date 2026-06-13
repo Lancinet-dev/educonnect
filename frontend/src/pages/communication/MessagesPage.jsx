@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
-import { Send, Plus, Search, ArrowLeft, MessageSquare, X, Check, CheckCheck } from 'lucide-react'
+import { useQueryClient } from '@tanstack/react-query'
+import { Send, Plus, Search, ArrowLeft, MessageSquare, X, CheckCheck } from 'lucide-react'
 import {
   useConversations, useContacts, useConversation,
   useSendMessage, useStartConversation,
@@ -10,7 +11,6 @@ import { getSocket } from '@/services/socket'
 import Card from '@/components/ui/Card'
 import Avatar from '@/components/ui/Avatar'
 import Spinner from '@/components/ui/Spinner'
-import Badge from '@/components/ui/Badge'
 import Modal from '@/components/ui/Modal'
 import EmptyState from '@/components/ui/EmptyState'
 import { ListSkeleton } from '@/components/ui/Skeleton'
@@ -28,7 +28,6 @@ function dayLabel(d) {
   return dt.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })
 }
 
-// ── Indicateur "en train d'écrire" (points qui pulsent) ───────
 function TypingDots() {
   return (
     <div className="flex items-center gap-1 px-3.5 py-2.5 rounded-2xl rounded-bl-md bg-white border border-surface-200 w-fit">
@@ -41,7 +40,6 @@ function TypingDots() {
   )
 }
 
-// ── Sélecteur de nouveau contact ──────────────────────────────
 function NewConversation({ open, onClose, onStarted }) {
   const { data: contacts, isLoading } = useContacts()
   const start = useStartConversation()
@@ -68,7 +66,7 @@ function NewConversation({ open, onClose, onStarted }) {
             <button key={c.id} disabled={start.isPending}
               onClick={async () => { const conv = await start.mutateAsync(c.id); onStarted(conv.id) }}
               className="w-full flex items-center gap-3 p-3 hover:bg-surface-50 text-left transition-colors">
-              <Avatar firstName={c.firstName} lastName={c.lastName} src={c.avatarUrl} size="md" />
+              <Avatar firstName={c.firstName} lastName={c.lastName} src={c.avatarUrl} size="md" role={c.role} />
               <div>
                 <p className="text-sm font-medium text-surface-900">{c.firstName} {c.lastName}</p>
                 <p className="text-xs text-surface-500">{ROLE_LABEL[c.role] || c.role}</p>
@@ -80,12 +78,13 @@ function NewConversation({ open, onClose, onStarted }) {
   )
 }
 
-// ── Fil de conversation (style WhatsApp) ──────────────────────
 function Thread({ conversationId, onBack }) {
   const { data, isLoading } = useConversation(conversationId)
   const send = useSendMessage()
+  const qc = useQueryClient()
   const [text, setText] = useState('')
   const [peerTyping, setPeerTyping] = useState(false)
+  const scrollRef = useRef(null)
   const bottomRef = useRef(null)
   const taRef = useRef(null)
   const typingTimeout = useRef(null)
@@ -93,7 +92,18 @@ function Thread({ conversationId, onBack }) {
 
   const contact = data?.contact
 
-  useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: 'smooth' }) }, [data?.messages?.length, peerTyping])
+  // Ouvrir une conversation la marque "lue" côté serveur → on rafraîchit
+  // les compteurs (liste + cloche + badge sidebar) pour faire disparaître le non-lu.
+  useEffect(() => {
+    if (!data) return
+    qc.invalidateQueries({ queryKey: ['conversations'] })
+    qc.invalidateQueries({ queryKey: ['notifications'] })
+  }, [conversationId, data?.id, qc])
+
+  // Scroll vers le bas à l'arrivée de nouveaux messages
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [data?.messages?.length, peerTyping])
 
   useEffect(() => {
     const s = getSocket(); if (!s) return
@@ -109,7 +119,6 @@ function Thread({ conversationId, onBack }) {
     return () => { s.off('typing', onTyping); s.off('stop-typing', onStop) }
   }, [conversationId])
 
-  // Auto-resize du textarea
   const onType = (e) => {
     setText(e.target.value)
     const ta = taRef.current
@@ -136,21 +145,21 @@ function Thread({ conversationId, onBack }) {
   const messages = data.messages || []
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full min-h-0">
       {/* En-tête */}
-      <div className="flex items-center gap-3 p-4 border-b border-surface-100 bg-white">
+      <div className="flex items-center gap-3 p-4 border-b border-surface-100 bg-white shrink-0">
         <button onClick={onBack} className="lg:hidden text-surface-500"><ArrowLeft size={18} /></button>
-        {contact && <Avatar firstName={contact.firstName} lastName={contact.lastName} src={contact.avatarUrl} size="md" />}
+        {contact && <Avatar firstName={contact.firstName} lastName={contact.lastName} src={contact.avatarUrl} size="md" role={contact.role} />}
         <div>
           <p className="font-semibold text-surface-900">{contact?.firstName} {contact?.lastName}</p>
-          <p className="text-xs text-surface-500">
+          <p className="text-xs text-surface-500 h-4">
             {peerTyping ? <span className="text-brand-600">en train d'écrire…</span> : (ROLE_LABEL[contact?.role] || contact?.role)}
           </p>
         </div>
       </div>
 
-      {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-1 bg-surface-50/60">
+      {/* Messages (scrollable) */}
+      <div ref={scrollRef} className="flex-1 min-h-0 overflow-y-auto p-4 space-y-1 bg-surface-50/60">
         {messages.map((m, i) => {
           const prev = messages[i - 1]
           const showDay = !prev || !isSameDay(new Date(prev.at), new Date(m.at))
@@ -160,17 +169,12 @@ function Thread({ conversationId, onBack }) {
             <div key={m.id}>
               {showDay && (
                 <div className="flex justify-center my-3">
-                  <span className="text-[11px] font-medium text-surface-500 bg-white border border-surface-200 rounded-full px-3 py-1 shadow-xs capitalize">
-                    {dayLabel(m.at)}
-                  </span>
+                  <span className="text-[11px] font-medium text-surface-500 bg-white border border-surface-200 rounded-full px-3 py-1 shadow-xs capitalize">{dayLabel(m.at)}</span>
                 </div>
               )}
-              <motion.div
-                initial={{ opacity: 0, y: 8, scale: 0.98 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
+              <motion.div initial={{ opacity: 0, y: 8, scale: 0.98 }} animate={{ opacity: 1, y: 0, scale: 1 }}
                 transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
-                className={`flex items-end gap-2 ${m.fromMe ? 'justify-end' : 'justify-start'} ${grouped ? 'mt-0.5' : 'mt-2'}`}
-              >
+                className={`flex items-end gap-2 ${m.fromMe ? 'justify-end' : 'justify-start'} ${grouped ? 'mt-0.5' : 'mt-2'}`}>
                 {!m.fromMe && (
                   <div className="w-7 shrink-0">
                     {!grouped && <Avatar firstName={contact?.firstName} lastName={contact?.lastName} src={contact?.avatarUrl} size="xs" />}
@@ -179,14 +183,11 @@ function Thread({ conversationId, onBack }) {
                 <div className={`max-w-[78%] px-3.5 py-2 text-sm shadow-xs ${
                   m.fromMe
                     ? `bg-brand-600 text-white rounded-2xl ${grouped ? 'rounded-tr-md' : 'rounded-br-md'}`
-                    : `bg-white border border-surface-200 text-surface-800 rounded-2xl ${grouped ? 'rounded-tl-md' : 'rounded-bl-md'}`
-                }`}>
+                    : `bg-white border border-surface-200 text-surface-800 rounded-2xl ${grouped ? 'rounded-tl-md' : 'rounded-bl-md'}`}`}>
                   <p className="whitespace-pre-wrap break-words leading-relaxed">{m.body}</p>
                   <div className={`flex items-center gap-1 justify-end mt-0.5 ${m.fromMe ? 'text-brand-100' : 'text-surface-400'}`}>
                     <span className="text-[10px]">{timeOf(m.at)}</span>
-                    {m.fromMe && (read
-                      ? <CheckCheck size={13} className="text-sky-300" />
-                      : <CheckCheck size={13} className="text-brand-200" />)}
+                    {m.fromMe && <CheckCheck size={13} className={read ? 'text-sky-300' : 'text-brand-200'} />}
                   </div>
                 </div>
               </motion.div>
@@ -195,8 +196,7 @@ function Thread({ conversationId, onBack }) {
         })}
         <AnimatePresence>
           {peerTyping && (
-            <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
-              className="flex items-end gap-2 mt-2">
+            <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="flex items-end gap-2 mt-2">
               <div className="w-7 shrink-0"><Avatar firstName={contact?.firstName} lastName={contact?.lastName} src={contact?.avatarUrl} size="xs" /></div>
               <TypingDots />
             </motion.div>
@@ -206,14 +206,12 @@ function Thread({ conversationId, onBack }) {
       </div>
 
       {/* Saisie */}
-      <div className="p-3 border-t border-surface-100 bg-white flex items-end gap-2">
+      <div className="p-3 border-t border-surface-100 bg-white flex items-end gap-2 shrink-0">
         <textarea ref={taRef} value={text} onChange={onType} rows={1}
           onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend() } }}
           placeholder="Écrire un message…"
-          className="flex-1 resize-none px-3.5 py-2.5 border border-surface-200 rounded-2xl text-sm leading-relaxed
-                     max-h-[120px] focus:outline-none focus:ring-2 focus:ring-brand-500" />
-        <motion.button
-          whileTap={{ scale: 0.9 }} onClick={handleSend} disabled={!text.trim() || send.isPending}
+          className="flex-1 resize-none px-3.5 py-2.5 border border-surface-200 rounded-2xl text-sm leading-relaxed max-h-[120px] focus:outline-none focus:ring-2 focus:ring-brand-500" />
+        <motion.button whileTap={{ scale: 0.9 }} onClick={handleSend} disabled={!text.trim() || send.isPending}
           animate={{ scale: text.trim() ? 1 : 0.92, opacity: text.trim() ? 1 : 0.5 }}
           className="w-10 h-10 rounded-full bg-brand-600 hover:bg-brand-700 disabled:cursor-not-allowed text-white flex items-center justify-center shrink-0">
           <Send size={18} />
@@ -233,42 +231,46 @@ export default function MessagesPage() {
   const selectConv = (id) => { setSelected(id); setParams({ c: id }) }
 
   return (
-    <div>
-      <h1 className="text-2xl font-bold font-display text-surface-900 mb-4">Messages</h1>
+    <div className="h-[calc(100dvh-9rem)] min-h-[460px] flex flex-col">
+      <h1 className="text-2xl font-bold font-display text-surface-900 mb-3 shrink-0">Messages</h1>
 
-      <Card padding={false} className="overflow-hidden">
-        <div className="grid grid-cols-1 lg:grid-cols-3 h-[calc(100vh-220px)] min-h-[440px]">
+      <Card padding={false} className="flex-1 min-h-0 overflow-hidden">
+        <div className="grid grid-cols-1 lg:grid-cols-3 h-full">
 
           {/* Liste des conversations */}
-          <div className={`border-r border-surface-100 flex flex-col ${selected ? 'hidden lg:flex' : 'flex'}`}>
-            <div className="flex items-center justify-between p-3 border-b border-surface-100">
+          <div className={`border-r border-surface-100 flex flex-col min-h-0 ${selected ? 'hidden lg:flex' : 'flex'}`}>
+            <div className="flex items-center justify-between p-3 border-b border-surface-100 shrink-0">
               <span className="font-semibold text-surface-900 text-sm">Conversations</span>
               <motion.button whileTap={{ scale: 0.9 }} onClick={() => setShowNew(true)}
                 className="w-8 h-8 rounded-lg bg-brand-50 text-brand-600 hover:bg-brand-100 flex items-center justify-center transition-colors">
                 <Plus size={18} />
               </motion.button>
             </div>
-            <div className="overflow-y-auto flex-1">
+            <div className="overflow-y-auto flex-1 min-h-0">
               {isLoading ? (
                 <div className="p-2"><ListSkeleton rows={6} /></div>
               ) : conversations?.length === 0 ? (
                 <EmptyState icon={MessageSquare} title="Aucune conversation" subtitle="Cliquez sur + pour démarrer un échange." />
               ) : conversations.map((c, idx) => (
                 <motion.button key={c.id}
-                  initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: idx * 0.03 }}
+                  initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: Math.min(idx * 0.03, 0.3) }}
                   onClick={() => selectConv(c.id)}
                   className={`w-full flex items-center gap-3 p-3 text-left border-b border-surface-50 hover:bg-surface-50 transition-colors ${selected === c.id ? 'bg-brand-50' : ''}`}>
-                  <Avatar firstName={c.contact.firstName} lastName={c.contact.lastName} src={c.contact.avatarUrl} size="md" />
+                  <Avatar firstName={c.contact.firstName} lastName={c.contact.lastName} src={c.contact.avatarUrl} size="md" role={c.contact.role} />
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between gap-2">
                       <p className="text-sm font-medium text-surface-900 truncate">{c.contact.firstName} {c.contact.lastName}</p>
                       {c.lastMessage && <span className="text-[10px] text-surface-400 shrink-0">{timeOf(c.lastMessage.at)}</span>}
                     </div>
                     <div className="flex items-center justify-between gap-2">
-                      <p className={`text-xs truncate ${c.unread > 0 ? 'text-surface-700 font-medium' : 'text-surface-500'}`}>
+                      <p className={`text-xs truncate ${c.unread > 0 ? 'text-surface-800 font-semibold' : 'text-surface-500'}`}>
                         {c.lastMessage ? (c.lastMessage.fromMe ? 'Vous : ' : '') + c.lastMessage.body : 'Nouvelle conversation'}
                       </p>
-                      {c.unread > 0 && <Badge variant="primary">{c.unread}</Badge>}
+                      {c.unread > 0 && (
+                        <span className="min-w-[18px] h-[18px] px-1 rounded-full bg-brand-600 text-white text-[10px] font-bold flex items-center justify-center shrink-0">
+                          {c.unread > 9 ? '9+' : c.unread}
+                        </span>
+                      )}
                     </div>
                   </div>
                 </motion.button>
@@ -277,7 +279,7 @@ export default function MessagesPage() {
           </div>
 
           {/* Conversation ouverte */}
-          <div className={`lg:col-span-2 ${selected ? 'flex' : 'hidden lg:flex'} flex-col`}>
+          <div className={`lg:col-span-2 min-h-0 ${selected ? 'flex' : 'hidden lg:flex'} flex-col`}>
             {selected ? (
               <Thread conversationId={selected} onBack={() => { setSelected(null); setParams({}) }} />
             ) : (
