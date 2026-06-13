@@ -2,6 +2,8 @@ import { Routes, Route, Navigate } from 'react-router-dom'
 import { useAuthStore } from '@/store/authStore'
 import AppLayout from '@/components/layout/AppLayout'
 
+// Public
+import LandingPage from '@/pages/LandingPage'
 // Auth
 import LoginPage from '@/pages/auth/LoginPage'
 import RegisterSchoolPage from '@/pages/auth/RegisterSchoolPage'
@@ -29,7 +31,8 @@ function ProtectedRoute({ children, allowedRoles }) {
 // Redirection selon le rôle
 function RoleRedirect() {
   const { isAuthenticated, user } = useAuthStore()
-  if (!isAuthenticated) return <Navigate to="/login" replace />
+  // Visiteur non connecté → landing page publique
+  if (!isAuthenticated) return <LandingPage />
 
   const routes = {
     super_admin:  '/superadmin',
