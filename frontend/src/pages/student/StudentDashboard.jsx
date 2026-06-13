@@ -13,6 +13,7 @@ import Spinner from '@/components/ui/Spinner'
 import { formatGNF } from '@/utils/format'
 import StudentGrades from './StudentGrades'
 import StudentHomework from './StudentHomework'
+import StudentTimetable from './StudentTimetable'
 import MessagesPage from '@/pages/communication/MessagesPage'
 import AnnouncementsPage from '@/pages/communication/AnnouncementsPage'
 import { useStudentHomework } from '@/hooks/useHomework'
@@ -215,6 +216,7 @@ export default function StudentDashboard() {
       <Route index element={<Overview />} />
       <Route path="notes" element={<StudentGrades />} />
       <Route path="devoirs" element={<StudentHomework />} />
+      <Route path="emploi-du-temps" element={<StudentTimetable />} />
       <Route path="messages" element={<MessagesPage />} />
       <Route path="annonces" element={<AnnouncementsPage />} />
     </Routes>

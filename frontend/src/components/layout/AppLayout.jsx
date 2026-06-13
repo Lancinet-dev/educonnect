@@ -4,7 +4,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import {
   LayoutDashboard, Users, BookOpen, ClipboardList,
   MessageSquare, CreditCard, BarChart3, Settings,
-  LogOut, Menu, X, GraduationCap, Megaphone
+  LogOut, Menu, X, GraduationCap, Megaphone, CalendarDays
 } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import { useAuthStore } from '@/store/authStore'
@@ -46,6 +46,7 @@ const MENUS = {
     { label: 'Élèves',          icon: Users,            path: '/director/eleves' },
     { label: 'Personnel',       icon: Users,            path: '/director/personnel' },
     { label: 'Classes',         icon: BookOpen,         path: '/director/classes' },
+    { label: 'Emploi du temps', icon: CalendarDays,     path: '/director/emploi-du-temps' },
     { label: 'Présences',       icon: ClipboardList,    path: '/director/presences' },
     { label: 'Finances',        icon: CreditCard,       path: '/director/finances' },
     { label: 'Messages',        icon: MessageSquare,    path: '/director/messages' },
