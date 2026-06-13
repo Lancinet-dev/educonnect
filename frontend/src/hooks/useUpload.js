@@ -1,5 +1,8 @@
 import { useQuery } from '@tanstack/react-query'
 import api from '@/services/api'
+import { useAuthStore } from '@/store/authStore'
+
+const API_BASE = import.meta.env.VITE_API_URL || '/api'
 
 // Indique si le service d'upload (Cloudinary) est configuré côté serveur
 export function useUploadStatus() {
@@ -10,19 +13,42 @@ export function useUploadStatus() {
   })
 }
 
-// Multipart : on laisse axios fixer le bon Content-Type (avec boundary)
-const multipart = { headers: { 'Content-Type': undefined } }
-
-export async function uploadAvatar(file) {
+// Upload via fetch : le navigateur pose lui-même le bon Content-Type
+// multipart/form-data (avec boundary). Plus fiable que de bricoler les
+// en-têtes d'axios. Réessaie une fois en cas d'échec réseau transitoire.
+async function uploadFile(path, file, attempt = 0) {
   const fd = new FormData()
   fd.append('file', file)
-  const { data } = await api.post('/upload/avatar', fd, multipart)
+  const token = useAuthStore.getState().accessToken
+
+  let res
+  try {
+    res = await fetch(`${API_BASE}${path}`, {
+      method: 'POST',
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+      body: fd,
+    })
+  } catch (networkErr) {
+    if (attempt < 1) return uploadFile(path, file, attempt + 1)
+    throw networkErr
+  }
+
+  const data = await res.json().catch(() => ({}))
+  if (!res.ok) {
+    // 5xx transitoire → on retente une fois
+    if (res.status >= 500 && attempt < 1) return uploadFile(path, file, attempt + 1)
+    const err = new Error(data.error || "Échec de l'envoi du fichier.")
+    err.response = { data, status: res.status }
+    throw err
+  }
+  return data
+}
+
+export async function uploadAvatar(file) {
+  const data = await uploadFile('/upload/avatar', file)
   return data.url
 }
 
 export async function uploadHomeworkFile(file) {
-  const fd = new FormData()
-  fd.append('file', file)
-  const { data } = await api.post('/upload/homework', fd, multipart)
-  return data // { url, name }
+  return uploadFile('/upload/homework', file) // { url, name }
 }

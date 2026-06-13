@@ -25,13 +25,25 @@ export function isCloudinaryConfigured() {
 }
 
 // Upload un buffer (mémoire) vers Cloudinary via un flux.
-export function uploadBuffer(buffer, options = {}) {
+// Réessaie automatiquement en cas d'échec réseau / "Request Timeout"
+// (les uploads Cloudinary échouent parfois de façon intermittente).
+export function uploadBuffer(buffer, options = {}, attempts = 3) {
   return new Promise((resolve, reject) => {
-    const stream = cloudinary.uploader.upload_stream(options, (err, result) => {
-      if (err) reject(err)
-      else resolve(result)
-    })
-    stream.end(buffer)
+    const tryUpload = (remaining) => {
+      const stream = cloudinary.uploader.upload_stream(
+        { timeout: 60000, ...options },
+        (err, result) => {
+          if (!err) return resolve(result)
+          if (remaining > 1) {
+            console.warn(`☁️  Upload Cloudinary échoué (${err.message || err.http_code}), nouvel essai…`)
+            return tryUpload(remaining - 1)
+          }
+          reject(err)
+        }
+      )
+      stream.end(buffer)
+    }
+    tryUpload(attempts)
   })
 }
 
