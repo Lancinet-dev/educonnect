@@ -13,6 +13,7 @@ import Card from '@/components/ui/Card'
 import Badge from '@/components/ui/Badge'
 import Avatar from '@/components/ui/Avatar'
 import Spinner from '@/components/ui/Spinner'
+import { DashboardSkeleton } from '@/components/ui/Skeleton'
 import { formatGNF, formatPercent } from '@/utils/format'
 import { useAuth } from '@/hooks/useAuth'
 import DirectorAttendance from './DirectorAttendance'
@@ -33,9 +34,7 @@ function Overview() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-96">
-        <Spinner />
-      </div>
+      <DashboardSkeleton />
     )
   }
 

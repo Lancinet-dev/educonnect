@@ -12,6 +12,7 @@ import StatCard from '@/components/ui/StatCard'
 import Card from '@/components/ui/Card'
 import Badge from '@/components/ui/Badge'
 import Spinner from '@/components/ui/Spinner'
+import { DashboardSkeleton } from '@/components/ui/Skeleton'
 import { formatGNF } from '@/utils/format'
 import MessagesPage from '@/pages/communication/MessagesPage'
 import AnnouncementsPage from '@/pages/communication/AnnouncementsPage'
@@ -26,9 +27,7 @@ function Overview() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-96">
-        <Spinner />
-      </div>
+      <DashboardSkeleton />
     )
   }
 

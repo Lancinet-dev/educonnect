@@ -12,6 +12,7 @@ import { useAuth } from '@/hooks/useAuth'
 import StatCard from '@/components/ui/StatCard'
 import Card from '@/components/ui/Card'
 import Spinner from '@/components/ui/Spinner'
+import { DashboardSkeleton } from '@/components/ui/Skeleton'
 import { formatGNF } from '@/utils/format'
 import AccountantPayments from './AccountantPayments'
 import AccountantExpenses from './AccountantExpenses'
@@ -31,7 +32,7 @@ function Overview() {
   const { user } = useAuth()
 
   if (isLoading) {
-    return <div className="flex items-center justify-center h-96"><Spinner /></div>
+    return <DashboardSkeleton />
   }
   if (error) {
     return <Card className="text-center py-12"><p className="text-red-600">Erreur lors du chargement des données.</p></Card>

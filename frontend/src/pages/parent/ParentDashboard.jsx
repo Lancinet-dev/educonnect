@@ -12,6 +12,7 @@ import Card from '@/components/ui/Card'
 import Badge from '@/components/ui/Badge'
 import Avatar from '@/components/ui/Avatar'
 import Spinner from '@/components/ui/Spinner'
+import { DashboardSkeleton } from '@/components/ui/Skeleton'
 import { formatGNF } from '@/utils/format'
 import ParentAttendance from './ParentAttendance'
 import ParentResults from './ParentResults'
@@ -53,7 +54,7 @@ function Overview() {
   const [activeIdx, setActiveIdx] = useState(0)
 
   if (isLoading) {
-    return <div className="flex items-center justify-center h-96"><Spinner /></div>
+    return <DashboardSkeleton />
   }
   if (error) {
     return <Card className="text-center py-12"><p className="text-red-600">Erreur lors du chargement des données.</p></Card>

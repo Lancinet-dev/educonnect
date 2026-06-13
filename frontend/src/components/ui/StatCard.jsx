@@ -1,5 +1,7 @@
 import { clsx } from 'clsx'
+import { motion } from 'framer-motion'
 import { TrendingUp, TrendingDown, Minus } from 'lucide-react'
+import AnimatedNumber from './AnimatedNumber'
 
 export default function StatCard({ label, value, icon: Icon, trend, trendLabel, color = 'brand', className = '' }) {
   const colorMap = {
@@ -11,13 +13,22 @@ export default function StatCard({ label, value, icon: Icon, trend, trendLabel, 
     purple:  { bg: 'bg-violet-50',  icon: 'text-violet-600',  text: 'text-violet-700' },
   }
   const c = colorMap[color] || colorMap.brand
+  const isNumber = typeof value === 'number'
 
   return (
-    <div className={clsx('bg-white rounded-xl border border-surface-200 shadow-sm p-5', className)}>
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+      whileHover={{ y: -3 }}
+      className={clsx('bg-white rounded-xl border border-surface-200 shadow-sm hover:shadow-md p-5 transition-shadow', className)}
+    >
       <div className="flex items-start justify-between">
-        <div className="flex-1">
+        <div className="flex-1 min-w-0">
           <p className="text-xs font-medium text-surface-500 uppercase tracking-wide mb-1">{label}</p>
-          <p className="text-2xl font-bold text-surface-900 font-display">{value}</p>
+          <p className="text-2xl font-bold text-surface-900 font-display truncate">
+            {isNumber ? <AnimatedNumber value={value} /> : value}
+          </p>
           {trend !== undefined && (
             <div className={clsx(
               'flex items-center gap-1 mt-1.5 text-xs font-medium',
@@ -34,6 +45,6 @@ export default function StatCard({ label, value, icon: Icon, trend, trendLabel, 
           </div>
         )}
       </div>
-    </div>
+    </motion.div>
   )
 }

@@ -104,7 +104,7 @@ router.get('/conversations/:id', async (req, res, next) => {
     }
 
     const { rows: contactRows } = await query(
-      `SELECT u.id, u.first_name, u.last_name, u.role, u.avatar_url
+      `SELECT u.id, u.first_name, u.last_name, u.role, u.avatar_url, cp.last_read_at
        FROM conversation_participants cp JOIN users u ON u.id = cp.user_id
        WHERE cp.conversation_id = $1 AND cp.user_id <> $2`,
       [id, req.user.id]
@@ -126,6 +126,7 @@ router.get('/conversations/:id', async (req, res, next) => {
     res.json({
       id,
       contact: c ? { id: c.id, firstName: c.first_name, lastName: c.last_name, role: c.role, avatarUrl: c.avatar_url } : null,
+      otherLastReadAt: c?.last_read_at || null,
       messages: messages.map(m => ({
         id: m.id, body: m.body, at: m.created_at, fromMe: m.sender_id === req.user.id, senderId: m.sender_id,
       })),

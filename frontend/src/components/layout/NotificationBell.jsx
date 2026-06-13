@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { AnimatePresence, motion } from 'framer-motion'
 import { Bell, MessageSquare, Megaphone, ClipboardList } from 'lucide-react'
 import { useNotifications } from '@/hooks/useNotifications'
 
@@ -42,16 +43,27 @@ export default function NotificationBell({ role }) {
     <div className="relative" ref={ref}>
       <button onClick={() => setOpen(o => !o)} className="relative text-surface-500 hover:text-surface-700 transition-colors">
         <Bell size={20} />
-        {count > 0 && (
-          <span className="absolute -top-1.5 -right-1.5 min-w-[16px] h-4 px-1 bg-red-500 text-white text-[10px]
-                           font-bold rounded-full flex items-center justify-center">
-            {count > 9 ? '9+' : count}
-          </span>
-        )}
+        <AnimatePresence>
+          {count > 0 && (
+            <motion.span
+              initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }}
+              className="absolute -top-1.5 -right-1.5 min-w-[16px] h-4 px-1 bg-red-500 text-white text-[10px]
+                         font-bold rounded-full flex items-center justify-center">
+              {count > 9 ? '9+' : count}
+            </motion.span>
+          )}
+        </AnimatePresence>
       </button>
 
+      <AnimatePresence>
       {open && (
-        <div className="absolute right-0 mt-2 w-80 bg-white rounded-xl border border-surface-200 shadow-lg z-50 overflow-hidden">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95, y: -8 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          exit={{ opacity: 0, scale: 0.95, y: -8 }}
+          transition={{ duration: 0.16, ease: [0.16, 1, 0.3, 1] }}
+          style={{ transformOrigin: 'top right' }}
+          className="absolute right-0 mt-2 w-80 bg-white rounded-xl border border-surface-200 shadow-lg z-50 overflow-hidden">
           <div className="px-4 py-3 border-b border-surface-100">
             <p className="font-semibold text-surface-900 text-sm">Notifications</p>
           </div>
@@ -77,8 +89,9 @@ export default function NotificationBell({ role }) {
               </button>
             ))}
           </div>
-        </div>
+        </motion.div>
       )}
+      </AnimatePresence>
     </div>
   )
 }

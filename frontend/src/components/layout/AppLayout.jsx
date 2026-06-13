@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
-import { NavLink, useNavigate } from 'react-router-dom'
+import { NavLink, useNavigate, useLocation } from 'react-router-dom'
+import { AnimatePresence, motion } from 'framer-motion'
 import { useQueryClient } from '@tanstack/react-query'
 import {
   LayoutDashboard, Users, BookOpen, ClipboardList,
@@ -101,6 +102,7 @@ export default function AppLayout({ children }) {
   const { user, fullName, role, logout } = useAuth()
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const navigate = useNavigate()
+  const location = useLocation()
   const qc = useQueryClient()
   const accessToken = useAuthStore(s => s.accessToken)
   const updateUser = useAuthStore(s => s.updateUser)
@@ -274,8 +276,18 @@ export default function AppLayout({ children }) {
         </header>
 
         {/* Contenu de la page */}
-        <main className="flex-1 p-6 overflow-auto animate-fade-in">
-          {children}
+        <main className="flex-1 p-6 overflow-auto">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={location.pathname}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -6 }}
+              transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+            >
+              {children}
+            </motion.div>
+          </AnimatePresence>
         </main>
       </div>
     </div>
