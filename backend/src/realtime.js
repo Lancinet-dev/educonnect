@@ -1,9 +1,23 @@
 import { Server } from 'socket.io'
 import jwt from 'jsonwebtoken'
+import { query } from './db/pool.js'
 
 let io = null
 
 const room = (userId) => `user:${userId}`
+
+// Renvoie les autres participants d'une conversation SI l'utilisateur en fait
+// partie ; sinon [] (non-participant → aucun relais). Empêche l'usurpation et
+// la fuite d'évènements vers des conversations auxquelles on n'appartient pas.
+async function otherParticipantsIfMember(conversationId, userId) {
+  if (!conversationId) return []
+  const { rows } = await query(
+    'SELECT user_id FROM conversation_participants WHERE conversation_id = $1',
+    [conversationId]
+  )
+  if (!rows.some(r => r.user_id === userId)) return []
+  return rows.filter(r => r.user_id !== userId).map(r => r.user_id)
+}
 
 // Initialise Socket.IO avec authentification par token JWT
 export function initRealtime(httpServer) {
@@ -26,13 +40,18 @@ export function initRealtime(httpServer) {
   io.on('connection', (socket) => {
     socket.join(room(socket.userId))
 
-    // Relais de l'indicateur « en train d'écrire »
-    socket.on('typing', ({ conversationId, to }) => {
-      if (to) io.to(room(to)).emit('typing', { conversationId, from: socket.userId })
-    })
-    socket.on('stop-typing', ({ conversationId, to }) => {
-      if (to) io.to(room(to)).emit('stop-typing', { conversationId, from: socket.userId })
-    })
+    // Relais de l'indicateur « en train d'écrire » — destinataires dérivés
+    // en base après vérification d'appartenance (le champ `to` client est ignoré).
+    const relayTyping = (event) => async ({ conversationId }) => {
+      try {
+        const recipients = await otherParticipantsIfMember(conversationId, socket.userId)
+        for (const uid of recipients) {
+          io.to(room(uid)).emit(event, { conversationId, from: socket.userId })
+        }
+      } catch { /* relais best-effort : on ignore les erreurs */ }
+    }
+    socket.on('typing', relayTyping('typing'))
+    socket.on('stop-typing', relayTyping('stop-typing'))
   })
 
   return io
