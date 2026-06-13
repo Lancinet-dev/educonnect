@@ -44,9 +44,15 @@ router.post('/homework', authorize('teacher', 'school_admin', 'super_admin'),
   requireCloudinary, upload.single('file'), async (req, res, next) => {
     try {
       if (!req.file) return res.status(400).json({ error: 'Aucun fichier fourni.' })
+      // Les images → type "image" (transformables) ; tout le reste (PDF, ZIP,
+      // docx…) → type "raw", non soumis à la restriction de delivery des PDF.
+      // Images → type "image" (delivrées + transformables).
+      // Autres (PDF, ZIP, docx…) → type "raw" : delivrées en flux sans être
+      // soumises à la restriction Cloudinary de delivery des PDF (compte gratuit).
+      const isImage = req.file.mimetype.startsWith('image/')
       const result = await uploadBuffer(req.file.buffer, {
         folder: 'educonnect/homework',
-        resource_type: 'auto',
+        resource_type: isImage ? 'image' : 'raw',
       })
       res.json({ url: result.secure_url, name: req.file.originalname })
     } catch (err) { next(err) }
