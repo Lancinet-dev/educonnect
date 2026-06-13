@@ -18,6 +18,9 @@ import { useAuth } from '@/hooks/useAuth'
 import DirectorAttendance from './DirectorAttendance'
 import DirectorFinances from './DirectorFinances'
 import DirectorTimetable from './DirectorTimetable'
+import DirectorStudents from './DirectorStudents'
+import DirectorStaff from './DirectorStaff'
+import DirectorClasses from './DirectorClasses'
 import MessagesPage from '@/pages/communication/MessagesPage'
 import AnnouncementsPage from '@/pages/communication/AnnouncementsPage'
 
@@ -249,6 +252,9 @@ export default function DirectorDashboard() {
   return (
     <Routes>
       <Route index element={<Overview />} />
+      <Route path="eleves" element={<DirectorStudents />} />
+      <Route path="personnel" element={<DirectorStaff />} />
+      <Route path="classes" element={<DirectorClasses />} />
       <Route path="presences" element={<DirectorAttendance />} />
       <Route path="finances" element={<DirectorFinances />} />
       <Route path="emploi-du-temps" element={<DirectorTimetable />} />
