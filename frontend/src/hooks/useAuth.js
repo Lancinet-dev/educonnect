@@ -35,6 +35,18 @@ export function useAuth() {
     },
   })
 
+  const registerMutation = useMutation({
+    mutationFn: (payload) => api.post('/auth/register-school', payload),
+    onSuccess: ({ data }) => {
+      queryClient.clear()
+      disconnectSocket()
+      store.setAuth(data.user, data.accessToken)
+      localStorage.setItem('educonnect-refresh-token', data.refreshToken)
+      toast.success(`Bienvenue sur EduConnect, ${data.user.first_name} !`)
+      navigate('/director')
+    },
+  })
+
   const logout = async () => {
     try {
       const refreshToken = localStorage.getItem('educonnect-refresh-token')
@@ -57,6 +69,8 @@ export function useAuth() {
     schoolId:        store.getSchoolId(),
     login:           loginMutation.mutateAsync,
     isLoggingIn:     loginMutation.isPending,
+    register:        registerMutation.mutateAsync,
+    isRegistering:   registerMutation.isPending,
     logout,
   }
 }

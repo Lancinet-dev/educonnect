@@ -85,4 +85,51 @@ router.get('/overview', async (req, res, next) => {
   }
 })
 
+// ── GET /api/superadmin/schools ───────────────────────────────
+// Toutes les écoles de la plateforme avec leur plan
+router.get('/schools', async (req, res, next) => {
+  try {
+    const { rows } = await query(
+      `SELECT s.id, s.name, s.short_name, s.city, s.region, s.type, s.plan, s.is_active, s.created_at,
+              (SELECT COUNT(*) FROM users WHERE school_id = s.id AND role = 'student' AND is_active) AS students,
+              (SELECT COUNT(*) FROM classes WHERE school_id = s.id) AS classes
+       FROM schools s
+       ORDER BY s.created_at DESC`
+    )
+    res.json(rows.map(s => ({
+      id: s.id, name: s.name, shortName: s.short_name, city: s.city, region: s.region,
+      type: s.type, plan: s.plan, isActive: s.is_active, createdAt: s.created_at,
+      students: parseInt(s.students), classes: parseInt(s.classes),
+    })))
+  } catch (err) { next(err) }
+})
+
+// ── PATCH /api/superadmin/schools/:id/plan ────────────────────
+// Activer/désactiver le Premium manuellement (en attendant le paiement auto)
+router.patch('/schools/:id/plan', async (req, res, next) => {
+  try {
+    const { plan } = req.body
+    if (!['free', 'premium'].includes(plan)) return res.status(400).json({ error: 'Plan invalide.' })
+    const maxClasses = plan === 'free' ? 3 : 1000
+    const { rows } = await query(
+      'UPDATE schools SET plan = $1, max_classes = $2 WHERE id = $3 RETURNING id',
+      [plan, maxClasses, req.params.id]
+    )
+    if (!rows[0]) return res.status(404).json({ error: 'École introuvable.' })
+    res.json({ ok: true, plan })
+  } catch (err) { next(err) }
+})
+
+// ── PATCH /api/superadmin/schools/:id/active ──────────────────
+router.patch('/schools/:id/active', async (req, res, next) => {
+  try {
+    const { rows } = await query(
+      'UPDATE schools SET is_active = $1 WHERE id = $2 RETURNING id',
+      [!!req.body.isActive, req.params.id]
+    )
+    if (!rows[0]) return res.status(404).json({ error: 'École introuvable.' })
+    res.json({ ok: true })
+  } catch (err) { next(err) }
+})
+
 export default router

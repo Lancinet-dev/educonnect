@@ -13,6 +13,7 @@ import Card from '@/components/ui/Card'
 import Badge from '@/components/ui/Badge'
 import Spinner from '@/components/ui/Spinner'
 import { formatGNF } from '@/utils/format'
+import SuperAdminSchools from './SuperAdminSchools'
 
 const PLAN_COLORS = { premium: '#6366f1', free: '#cbd5e1' }
 
@@ -190,6 +191,8 @@ export default function SuperAdminDashboard() {
   return (
     <Routes>
       <Route index element={<Overview />} />
+      <Route path="ecoles" element={<SuperAdminSchools />} />
+      <Route path="abonnements" element={<SuperAdminSchools />} />
     </Routes>
   )
 }

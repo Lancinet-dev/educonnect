@@ -1,7 +1,7 @@
 import express from 'express'
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
-import { query } from '../db/pool.js'
+import { query, pool } from '../db/pool.js'
 import { authenticate } from '../middleware/auth.middleware.js'
 
 const router = express.Router()
@@ -72,6 +72,82 @@ router.post('/login', async (req, res, next) => {
     res.json({ accessToken, refreshToken, user: userSafe })
   } catch (err) {
     next(err)
+  }
+})
+
+// ── POST /api/auth/register-school ────────────────────────────
+// Inscription self-service : crée une école + son compte directeur,
+// puis connecte automatiquement l'utilisateur.
+router.post('/register-school', async (req, res, next) => {
+  const client = await pool.connect()
+  try {
+    const { school = {}, admin = {} } = req.body
+    const { name, type = 'private', city, region, phone, email: schoolEmail, plan = 'free' } = school
+    const { firstName, lastName, email, password } = admin
+
+    if (!name?.trim()) { client.release(); return res.status(400).json({ error: "Nom de l'école requis." }) }
+    if (!firstName?.trim() || !lastName?.trim() || !email?.trim() || !password) {
+      client.release(); return res.status(400).json({ error: 'Informations du compte administrateur incomplètes.' })
+    }
+    if (password.length < 8) { client.release(); return res.status(400).json({ error: 'Le mot de passe doit faire au moins 8 caractères.' }) }
+    if (!['public', 'private'].includes(type)) { client.release(); return res.status(400).json({ error: 'Type d\'école invalide.' }) }
+    if (!['free', 'premium'].includes(plan)) { client.release(); return res.status(400).json({ error: 'Plan invalide.' }) }
+
+    const shortName = name.trim().split(/\s+/).map(w => w[0]).join('').toUpperCase().slice(0, 5) || 'ECO'
+    const maxClasses = plan === 'free' ? 3 : 1000
+
+    // Année scolaire courante (démarre en septembre)
+    const now = new Date()
+    const startYear = now.getMonth() >= 8 ? now.getFullYear() : now.getFullYear() - 1
+    const label = `${startYear}-${startYear + 1}`
+
+    await client.query('BEGIN')
+
+    const { rows: [sch] } = await client.query(
+      `INSERT INTO schools (name, short_name, type, plan, city, region, phone, email, max_classes)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING id`,
+      [name.trim(), shortName, type, plan, city?.trim() || null, region?.trim() || null,
+       phone?.trim() || null, schoolEmail?.trim() || null, maxClasses]
+    )
+    const schoolId = sch.id
+
+    await client.query(
+      `INSERT INTO academic_years (school_id, label, start_date, end_date, is_current)
+       VALUES ($1, $2, $3, $4, TRUE)`,
+      [schoolId, label, `${startYear}-09-01`, `${startYear + 1}-07-31`]
+    )
+
+    const hash = await bcrypt.hash(password, 12)
+    const { rows: [usr] } = await client.query(
+      `INSERT INTO users (school_id, role, first_name, last_name, email, password_hash)
+       VALUES ($1, 'school_admin', $2, $3, $4, $5) RETURNING id`,
+      [schoolId, firstName.trim(), lastName.trim(), email.trim().toLowerCase(), hash]
+    )
+
+    const { accessToken, refreshToken } = genererTokens(usr.id)
+    await client.query(
+      `INSERT INTO refresh_tokens (user_id, token, expires_at)
+       VALUES ($1, $2, NOW() + INTERVAL '30 days')`,
+      [usr.id, refreshToken]
+    )
+
+    await client.query('COMMIT')
+
+    // Récupérer l'utilisateur au même format que le login
+    const { rows: [user] } = await query(
+      `SELECT u.id, u.school_id, u.role, u.first_name, u.last_name, u.email, u.phone, u.avatar_url, u.gender,
+              s.name AS school_name, s.logo_url AS school_logo, s.plan AS school_plan, s.short_name AS school_short_name
+       FROM users u LEFT JOIN schools s ON s.id = u.school_id WHERE u.id = $1`,
+      [usr.id]
+    )
+
+    res.status(201).json({ accessToken, refreshToken, user })
+  } catch (err) {
+    await client.query('ROLLBACK').catch(() => {})
+    if (err.code === '23505') return res.status(409).json({ error: 'Cet email est déjà utilisé.' })
+    next(err)
+  } finally {
+    client.release()
   }
 })
 

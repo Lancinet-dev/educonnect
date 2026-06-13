@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import { Eye, EyeOff, Mail, Lock, GraduationCap } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 
@@ -148,6 +149,16 @@ export default function LoginPage() {
               )}
             </button>
           </form>
+
+          {/* Inscription nouvelle école */}
+          <div className="mt-5 pt-5 border-t border-surface-100 text-center">
+            <p className="text-sm text-surface-500">
+              Votre école n'est pas encore inscrite ?
+            </p>
+            <Link to="/inscription" className="inline-block mt-1.5 text-sm font-semibold text-brand-600 hover:text-brand-700">
+              Créer mon école →
+            </Link>
+          </div>
         </div>
 
         {/* Comptes de démo */}

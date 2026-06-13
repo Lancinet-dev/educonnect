@@ -220,6 +220,19 @@ router.post('/classes', async (req, res, next) => {
   try {
     const { name, levelId, maxStudents, room } = req.body
     if (!name?.trim()) return res.status(400).json({ error: 'Nom de la classe requis.' })
+
+    // Limite du plan gratuit
+    const { rows: [sch] } = await query('SELECT plan, max_classes FROM schools WHERE id = $1', [req.user.school_id])
+    if (sch && sch.plan === 'free') {
+      const { rows: [c] } = await query('SELECT COUNT(*) FROM classes WHERE school_id = $1', [req.user.school_id])
+      if (parseInt(c.count) >= (sch.max_classes || 3)) {
+        return res.status(403).json({
+          error: `Limite du plan gratuit atteinte (${sch.max_classes || 3} classes). Passez en Premium pour en créer davantage.`,
+          code: 'PLAN_LIMIT',
+        })
+      }
+    }
+
     const { rows: [yr] } = await query('SELECT id FROM academic_years WHERE school_id = $1 AND is_current LIMIT 1', [req.user.school_id])
     const { rows } = await query(
       `INSERT INTO classes (school_id, level_id, academic_year_id, name, max_students, room)

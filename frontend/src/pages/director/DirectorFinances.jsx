@@ -1,12 +1,15 @@
 import { useState } from 'react'
-import { Download, AlertTriangle, PieChart as PieIcon } from 'lucide-react'
+import toast from 'react-hot-toast'
+import { Download, AlertTriangle, PieChart as PieIcon, Sparkles } from 'lucide-react'
 import {
   BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, CartesianGrid,
 } from 'recharts'
 import { useDirectorFinance, useFinanceClasses, downloadUnpaidCsv } from '@/hooks/useFinance'
+import { useAuth } from '@/hooks/useAuth'
 import Card from '@/components/ui/Card'
 import Avatar from '@/components/ui/Avatar'
 import Button from '@/components/ui/Button'
+import Badge from '@/components/ui/Badge'
 import Spinner from '@/components/ui/Spinner'
 import { formatGNF } from '@/utils/format'
 
@@ -14,6 +17,16 @@ export default function DirectorFinances() {
   const [classId, setClassId] = useState('')
   const { data, isLoading } = useDirectorFinance(classId)
   const { data: cl } = useFinanceClasses()
+  const { user } = useAuth()
+  const isPremium = user?.school_plan === 'premium'
+
+  const onExport = () => {
+    if (!isPremium) {
+      toast('📊 L\'export CSV est une fonctionnalité Premium. Contactez l\'administrateur pour activer le Premium.', { icon: '✦' })
+      return
+    }
+    downloadUnpaidCsv()
+  }
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -74,8 +87,10 @@ export default function DirectorFinances() {
                   <option value="">Toutes les classes</option>
                   {cl?.classes.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                 </select>
-                <Button variant="secondary" size="sm" icon={<Download size={14} />} onClick={downloadUnpaidCsv}>
-                  Export CSV
+                <Button variant="secondary" size="sm"
+                  icon={isPremium ? <Download size={14} /> : <Sparkles size={14} className="text-amber-500" />}
+                  onClick={onExport}>
+                  Export CSV {!isPremium && <Badge variant="warning" className="ml-1">Premium</Badge>}
                 </Button>
               </div>
             </div>

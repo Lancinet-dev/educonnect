@@ -366,6 +366,11 @@ router.get('/director', authenticate, authorize('school_admin', 'super_admin'), 
 // ── GET /api/finance/director/unpaid.csv ──────────────────────
 router.get('/director/unpaid.csv', authenticate, authorize('school_admin', 'super_admin'), async (req, res, next) => {
   try {
+    // Fonctionnalité Premium
+    const { rows: [sch] } = await query('SELECT plan FROM schools WHERE id = $1', [req.user.school_id])
+    if (sch && sch.plan === 'free') {
+      return res.status(403).json({ error: "L'export CSV est une fonctionnalité Premium.", code: 'PREMIUM_ONLY' })
+    }
     const { rows } = await query(
       `SELECT u.first_name, u.last_name, c.name AS class_name,
               SUM(fi.amount_due - fi.amount_paid) AS balance

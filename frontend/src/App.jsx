@@ -4,6 +4,7 @@ import AppLayout from '@/components/layout/AppLayout'
 
 // Auth
 import LoginPage from '@/pages/auth/LoginPage'
+import RegisterSchoolPage from '@/pages/auth/RegisterSchoolPage'
 
 // Dashboards
 import ParentDashboard     from '@/pages/parent/ParentDashboard'
@@ -45,6 +46,7 @@ export default function App() {
   return (
     <Routes>
       <Route path="/login" element={<LoginPage />} />
+      <Route path="/inscription" element={<RegisterSchoolPage />} />
       <Route path="/"      element={<RoleRedirect />} />
 
       <Route path="/parent/*"
