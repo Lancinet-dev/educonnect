@@ -40,6 +40,14 @@ export function useToggleStaffActive() {
   return useMutation({ mutationFn: async ({ id, isActive }) => (await api.patch(`/management/staff/${id}/active`, { isActive })).data, onSuccess: inval(qc) })
 }
 
+export function useUpdateSchool() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async (p) => (await api.patch('/management/school', p)).data,
+    onSuccess: () => inval(qc)(),
+  })
+}
+
 // ── Niveaux & Classes ─────────────────────────────────────────
 export function useLevels() {
   return useQuery({ queryKey: ['management', 'levels'], queryFn: async () => (await api.get('/management/levels')).data })

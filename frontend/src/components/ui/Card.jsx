@@ -1,17 +1,23 @@
 import { clsx } from 'clsx'
+import { motion } from 'framer-motion'
 
-export default function Card({ children, className = '', padding = true, hover = false, ...props }) {
-  return (
-    <div
-      className={clsx(
-        'bg-white rounded-xl border border-surface-200 shadow-sm',
-        padding && 'p-5',
-        hover && 'hover:shadow-md hover:border-surface-300 transition-all duration-200 cursor-pointer',
-        className
-      )}
-      {...props}
-    >
-      {children}
-    </div>
+export default function Card({ children, className = '', padding = true, hover = false, glass = false, ...props }) {
+  const base = clsx(
+    'rounded-2xl transition-shadow duration-200',
+    glass
+      ? 'bg-white/70 backdrop-blur-xl border border-white/40 shadow-card'
+      : 'bg-white border border-surface-100 shadow-card',
+    padding && 'p-5',
+    className
   )
+
+  if (hover) {
+    return (
+      <motion.div whileHover={{ y: -4 }} transition={{ duration: 0.2 }}
+        className={clsx(base, 'hover:shadow-premium cursor-pointer')} {...props}>
+        {children}
+      </motion.div>
+    )
+  }
+  return <div className={base} {...props}>{children}</div>
 }

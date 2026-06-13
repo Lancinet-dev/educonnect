@@ -19,14 +19,18 @@ export default function Badge({ children, variant = 'default', dot = false, clas
       className
     )}>
       {dot && (
-        <span className={clsx(
-          'w-1.5 h-1.5 rounded-full',
-          variant === 'success' ? 'bg-emerald-500' :
-          variant === 'warning' ? 'bg-amber-500' :
-          variant === 'danger'  ? 'bg-red-500' :
-          variant === 'info'    ? 'bg-blue-500' :
-          'bg-surface-500'
-        )} />
+        <span className="relative flex w-1.5 h-1.5">
+          <span className={clsx('absolute inline-flex h-full w-full rounded-full opacity-60 animate-ping',
+            variant === 'success' ? 'bg-emerald-500' :
+            variant === 'warning' ? 'bg-amber-500' :
+            variant === 'danger'  ? 'bg-red-500' :
+            variant === 'info'    ? 'bg-blue-500' : 'bg-surface-500')} />
+          <span className={clsx('relative inline-flex rounded-full w-1.5 h-1.5',
+            variant === 'success' ? 'bg-emerald-500' :
+            variant === 'warning' ? 'bg-amber-500' :
+            variant === 'danger'  ? 'bg-red-500' :
+            variant === 'info'    ? 'bg-blue-500' : 'bg-surface-500')} />
+        </span>
       )}
       {children}
     </span>

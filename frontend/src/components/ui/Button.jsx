@@ -1,19 +1,20 @@
 import { clsx } from 'clsx'
+import { motion } from 'framer-motion'
 import { Loader2 } from 'lucide-react'
 
 const variants = {
-  primary:   'bg-brand-600 hover:bg-brand-700 active:bg-brand-800 text-white shadow-xs border border-brand-700',
-  secondary: 'bg-white hover:bg-surface-50 active:bg-surface-100 text-surface-700 border border-surface-200 shadow-xs',
-  ghost:     'bg-transparent hover:bg-surface-100 active:bg-surface-200 text-surface-600 border border-transparent',
-  danger:    'bg-red-600 hover:bg-red-700 active:bg-red-800 text-white shadow-xs border border-red-700',
-  success:   'bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs border border-emerald-700',
+  primary:   'bg-gradient-to-r from-brand-600 to-secondary-600 text-white shadow-sm hover:shadow-glow-btn border border-brand-700/20',
+  secondary: 'bg-white hover:bg-surface-50 text-surface-700 border border-surface-200 shadow-xs',
+  ghost:     'bg-transparent hover:bg-brand-50 text-surface-600 hover:text-brand-700 border border-transparent',
+  danger:    'bg-gradient-to-r from-red-500 to-red-600 text-white shadow-sm hover:shadow-[0_0_20px_rgba(239,68,68,0.4)] border border-red-700/20',
+  success:   'bg-gradient-to-r from-emerald-500 to-emerald-600 text-white shadow-sm border border-emerald-700/20',
 }
 const sizes = {
-  xs: 'px-2.5 py-1 text-xs rounded-md gap-1',
-  sm: 'px-3 py-1.5 text-sm rounded-lg gap-1.5',
-  md: 'px-4 py-2 text-sm rounded-lg gap-2',
-  lg: 'px-5 py-2.5 text-base rounded-xl gap-2',
-  xl: 'px-6 py-3 text-base rounded-xl gap-2.5',
+  xs: 'px-2.5 py-1 text-xs rounded-lg gap-1 min-h-[28px]',
+  sm: 'px-3 py-1.5 text-sm rounded-lg gap-1.5 min-h-[34px]',
+  md: 'px-4 py-2 text-sm rounded-xl gap-2 min-h-[40px]',
+  lg: 'px-5 py-2.5 text-base rounded-xl gap-2 min-h-[44px]',
+  xl: 'px-6 py-3 text-base rounded-2xl gap-2.5 min-h-[48px]',
 }
 
 export default function Button({
@@ -21,14 +22,18 @@ export default function Button({
   loading = false, disabled = false, icon, iconRight,
   className = '', ...props
 }) {
+  const isDisabled = disabled || loading
   return (
-    <button
-      disabled={disabled || loading}
+    <motion.button
+      whileHover={isDisabled ? undefined : { scale: 1.02, y: -1 }}
+      whileTap={isDisabled ? undefined : { scale: 0.98 }}
+      transition={{ duration: 0.15 }}
+      disabled={isDisabled}
       className={clsx(
-        'inline-flex items-center justify-center font-medium',
-        'transition-all duration-150 active:scale-[0.98]',
+        'inline-flex items-center justify-center font-medium select-none',
+        'transition-colors duration-150',
         'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-1',
-        'disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100',
+        'disabled:opacity-50 disabled:cursor-not-allowed',
         variants[variant],
         sizes[size],
         className
@@ -40,6 +45,6 @@ export default function Button({
       ) : icon}
       {children}
       {!loading && iconRight}
-    </button>
+    </motion.button>
   )
 }

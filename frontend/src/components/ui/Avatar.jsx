@@ -29,7 +29,13 @@ const sizes = {
   '2xl': 'w-20 h-20 text-2xl',
 }
 
-export default function Avatar({ firstName, lastName, src, size = 'md', className = '' }) {
+const ROLE_RING = {
+  school_admin: 'ring-blue-400', founder: 'ring-violet-400', teacher: 'ring-emerald-400',
+  student: 'ring-sky-400', parent: 'ring-amber-400', accountant: 'ring-teal-400',
+  surveillant: 'ring-rose-400', super_admin: 'ring-indigo-400',
+}
+
+export default function Avatar({ firstName, lastName, src, size = 'md', role, className = '' }) {
   const initials = getInitials(firstName, lastName)
   const colorClass = getColor(`${firstName}${lastName}`)
 
@@ -38,12 +44,33 @@ export default function Avatar({ firstName, lastName, src, size = 'md', classNam
       'rounded-full flex items-center justify-center font-semibold shrink-0 overflow-hidden',
       sizes[size],
       !src && colorClass,
+      role && `ring-2 ring-offset-2 ring-offset-white ${ROLE_RING[role] || 'ring-surface-300'}`,
       className
     )}>
       {src
         ? <img src={src} alt={initials} className="w-full h-full object-cover" />
         : <span>{initials}</span>
       }
+    </div>
+  )
+}
+
+// Groupe d'avatars qui se chevauchent
+export function AvatarGroup({ people = [], max = 4, size = 'sm' }) {
+  const shown = people.slice(0, max)
+  const extra = people.length - shown.length
+  return (
+    <div className="flex items-center -space-x-2">
+      {shown.map((p, i) => (
+        <div key={i} className="ring-2 ring-white rounded-full">
+          <Avatar firstName={p.firstName} lastName={p.lastName} src={p.avatarUrl} size={size} />
+        </div>
+      ))}
+      {extra > 0 && (
+        <div className={clsx('rounded-full ring-2 ring-white bg-surface-100 text-surface-600 flex items-center justify-center font-semibold', sizes[size])}>
+          +{extra}
+        </div>
+      )}
     </div>
   )
 }

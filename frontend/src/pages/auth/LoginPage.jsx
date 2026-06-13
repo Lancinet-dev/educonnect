@@ -32,14 +32,21 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-surface-50 flex flex-col items-center justify-center p-4">
+    <div className="min-h-screen aurora-bg relative flex flex-col items-center justify-center p-4 overflow-hidden">
 
-      <div className="w-full max-w-md animate-fade-in">
+      {/* Formes flottantes animées */}
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+        <div className="absolute -top-20 -left-16 w-72 h-72 rounded-full bg-brand-400/20 blur-3xl animate-float" style={{ animationDelay: '0s' }} />
+        <div className="absolute top-1/3 -right-20 w-80 h-80 rounded-full bg-secondary-500/15 blur-3xl animate-float" style={{ animationDelay: '2s' }} />
+        <div className="absolute -bottom-24 left-1/4 w-72 h-72 rounded-full bg-sky-400/15 blur-3xl animate-float" style={{ animationDelay: '4s' }} />
+      </div>
+
+      <div className="w-full max-w-md animate-fade-in relative z-10">
 
         {/* Logo et titre */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-14 h-14 bg-brand-600
-                          rounded-2xl shadow-lg mb-4">
+          <div className="inline-flex items-center justify-center w-14 h-14 bg-gradient-to-br from-brand-600 to-secondary-600
+                          rounded-2xl shadow-glow mb-4">
             <GraduationCap size={28} className="text-white" />
           </div>
           <h1 className="text-2xl font-bold font-display text-surface-900">

@@ -172,6 +172,20 @@ router.patch('/staff/:id/active', async (req, res, next) => {
 })
 
 // ════════════════════════════════════════════════════════════
+//  ÉCOLE (onboarding : nom + logo)
+// ════════════════════════════════════════════════════════════
+router.patch('/school', async (req, res, next) => {
+  try {
+    const { name, logoUrl } = req.body
+    await query(
+      'UPDATE schools SET name = COALESCE($1, name), logo_url = COALESCE($2, logo_url) WHERE id = $3',
+      [name?.trim() || null, logoUrl || null, req.user.school_id]
+    )
+    res.json({ ok: true })
+  } catch (err) { next(err) }
+})
+
+// ════════════════════════════════════════════════════════════
 //  NIVEAUX
 // ════════════════════════════════════════════════════════════
 router.get('/levels', async (req, res, next) => {

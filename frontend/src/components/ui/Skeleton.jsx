@@ -1,7 +1,7 @@
 import { clsx } from 'clsx'
 
 export function Skeleton({ className = '' }) {
-  return <div className={clsx('bg-surface-200/70 rounded-lg animate-pulse', className)} />
+  return <div className={clsx('skeleton-shimmer rounded-lg', className)} />
 }
 
 export function StatCardSkeleton() {
