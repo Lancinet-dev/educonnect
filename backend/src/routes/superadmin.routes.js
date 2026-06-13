@@ -7,10 +7,19 @@ const router = express.Router()
 // Réservé au propriétaire de la plateforme SaaS
 router.use(authenticate, authorize('super_admin'))
 
-// ── Constante d'abonnement ────────────────────────────────────
-// Montant mensuel facturé par école au plan premium (en GNF).
-// Modifier ici pour ajuster le calcul du MRR.
-const PREMIUM_MONTHLY_PRICE_GNF = 500000
+// Prix Premium par défaut si le paramètre n'est pas encore défini (en GNF)
+const DEFAULT_PREMIUM_PRICE = 500000
+
+// Lit un paramètre plateforme
+async function getSetting(key, fallback = null) {
+  const { rows } = await query('SELECT value FROM platform_settings WHERE key = $1', [key])
+  return rows[0] ? rows[0].value : fallback
+}
+async function getPremiumPrice() {
+  const v = await getSetting('premium_price')
+  const n = parseInt(v)
+  return Number.isFinite(n) && n >= 0 ? n : DEFAULT_PREMIUM_PRICE
+}
 
 // ── GET /api/superadmin/overview ──────────────────────────────
 // Vue globale de toute la plateforme (aucun filtre school_id)
@@ -53,7 +62,8 @@ router.get('/overview', async (req, res, next) => {
     )
 
     const premiumCount = parseInt(schoolStats.premium)
-    const mrr = premiumCount * PREMIUM_MONTHLY_PRICE_GNF
+    const premiumPrice = await getPremiumPrice()
+    const mrr = premiumCount * premiumPrice
 
     res.json({
       schools: {
@@ -65,7 +75,7 @@ router.get('/overview', async (req, res, next) => {
       },
       usersTotal: parseInt(userStats.total),
       mrr,
-      premiumPrice: PREMIUM_MONTHLY_PRICE_GNF,
+      premiumPrice,
       recentSchools: recentSchools.map(s => ({
         id:        s.id,
         name:      s.name,
@@ -117,6 +127,107 @@ router.patch('/schools/:id/plan', async (req, res, next) => {
     )
     if (!rows[0]) return res.status(404).json({ error: 'École introuvable.' })
     res.json({ ok: true, plan })
+  } catch (err) { next(err) }
+})
+
+// ── GET /api/superadmin/users?q=&role=&schoolId= ──────────────
+// Recherche transverse sur toute la plateforme
+router.get('/users', async (req, res, next) => {
+  try {
+    const { q = '', role, schoolId } = req.query
+    const params = []
+    const conds = []
+    if (q.trim()) {
+      params.push(`%${q.trim()}%`)
+      conds.push(`(u.first_name ILIKE $${params.length} OR u.last_name ILIKE $${params.length} OR u.email ILIKE $${params.length})`)
+    }
+    if (role)     { params.push(role);     conds.push(`u.role = $${params.length}`) }
+    if (schoolId) { params.push(schoolId); conds.push(`u.school_id = $${params.length}`) }
+    const where = conds.length ? `WHERE ${conds.join(' AND ')}` : ''
+
+    const { rows } = await query(
+      `SELECT u.id, u.first_name, u.last_name, u.email, u.role, u.is_active, u.last_login,
+              s.name AS school_name
+       FROM users u LEFT JOIN schools s ON s.id = u.school_id
+       ${where}
+       ORDER BY u.is_active DESC, u.last_login DESC NULLS LAST
+       LIMIT 100`,
+      params
+    )
+    res.json(rows.map(u => ({
+      id: u.id, firstName: u.first_name, lastName: u.last_name, email: u.email,
+      role: u.role, isActive: u.is_active, lastLogin: u.last_login, schoolName: u.school_name,
+    })))
+  } catch (err) { next(err) }
+})
+
+// ── PATCH /api/superadmin/users/:id/active ────────────────────
+router.patch('/users/:id/active', async (req, res, next) => {
+  try {
+    if (req.params.id === req.user.id) return res.status(400).json({ error: 'Vous ne pouvez pas vous désactiver vous-même.' })
+    const { rows } = await query('UPDATE users SET is_active = $1 WHERE id = $2 RETURNING id', [!!req.body.isActive, req.params.id])
+    if (!rows[0]) return res.status(404).json({ error: 'Utilisateur introuvable.' })
+    res.json({ ok: true })
+  } catch (err) { next(err) }
+})
+
+// ── GET /api/superadmin/stats ─────────────────────────────────
+// Statistiques d'usage global de la plateforme
+router.get('/stats', async (req, res, next) => {
+  try {
+    const [schoolsByMonth, studentsByMonth, byRole, activity] = await Promise.all([
+      query(
+        `SELECT to_char(date_trunc('month', created_at), 'Mon') AS month,
+                date_trunc('month', created_at) AS d, COUNT(*) AS total
+         FROM schools WHERE created_at >= date_trunc('month', CURRENT_DATE) - INTERVAL '5 months'
+         GROUP BY 1, 2 ORDER BY d`
+      ),
+      query(
+        `SELECT to_char(date_trunc('month', created_at), 'Mon') AS month,
+                date_trunc('month', created_at) AS d, COUNT(*) AS total
+         FROM users WHERE role = 'student' AND created_at >= date_trunc('month', CURRENT_DATE) - INTERVAL '5 months'
+         GROUP BY 1, 2 ORDER BY d`
+      ),
+      query(`SELECT role, COUNT(*) AS total FROM users GROUP BY role ORDER BY total DESC`),
+      query(
+        `SELECT
+           COUNT(*) FILTER (WHERE last_login >= NOW() - INTERVAL '7 days')  AS active_7,
+           COUNT(*) FILTER (WHERE last_login >= NOW() - INTERVAL '30 days') AS active_30,
+           COUNT(*) AS total
+         FROM users`
+      ),
+    ])
+    res.json({
+      schoolsByMonth: schoolsByMonth.rows.map(r => ({ month: r.month, total: parseInt(r.total) })),
+      studentsByMonth: studentsByMonth.rows.map(r => ({ month: r.month, total: parseInt(r.total) })),
+      usersByRole: byRole.rows.map(r => ({ role: r.role, total: parseInt(r.total) })),
+      activity: {
+        active7: parseInt(activity.rows[0].active_7),
+        active30: parseInt(activity.rows[0].active_30),
+        total: parseInt(activity.rows[0].total),
+      },
+    })
+  } catch (err) { next(err) }
+})
+
+// ── GET / PATCH /api/superadmin/settings ──────────────────────
+router.get('/settings', async (req, res, next) => {
+  try {
+    res.json({ premiumPrice: await getPremiumPrice() })
+  } catch (err) { next(err) }
+})
+
+router.patch('/settings', async (req, res, next) => {
+  try {
+    const { premiumPrice } = req.body
+    const n = parseInt(premiumPrice)
+    if (!Number.isFinite(n) || n < 0) return res.status(400).json({ error: 'Prix invalide.' })
+    await query(
+      `INSERT INTO platform_settings (key, value, updated_at) VALUES ('premium_price', $1, NOW())
+       ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, updated_at = NOW()`,
+      [String(n)]
+    )
+    res.json({ premiumPrice: n })
   } catch (err) { next(err) }
 })
 
