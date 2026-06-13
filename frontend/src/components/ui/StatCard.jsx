@@ -28,7 +28,7 @@ export default function StatCard({ label, value, icon: Icon, trend, trendLabel, 
     >
       <div className="flex items-start justify-between gap-3">
         <div className="flex-1 min-w-0">
-          <p className="text-[11px] font-semibold text-surface-500 uppercase tracking-wider mb-1.5">{label}</p>
+          <p className="text-[11px] font-semibold text-surface-500 uppercase tracking-wide mb-1.5 truncate">{label}</p>
           <p className="text-3xl font-bold text-surface-900 font-display font-tabular truncate">
             {isNumber ? <AnimatedNumber value={value} /> : value}
           </p>

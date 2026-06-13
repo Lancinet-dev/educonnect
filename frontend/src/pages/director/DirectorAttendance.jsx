@@ -50,7 +50,7 @@ export default function DirectorAttendance() {
         <div className="flex justify-center h-32 items-center"><Spinner /></div>
       ) : stats && (
         <>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             <StatCard label="Présence ce mois"  value={stats.month.presenceRate != null ? `${stats.month.presenceRate}%` : '—'} icon={TrendingUp}  color="green" />
             <StatCard label="Présence (7 jours)" value={stats.weekPresenceRate != null ? `${stats.weekPresenceRate}%` : '—'}   icon={CalendarDays} color="brand" />
             <StatCard label="Absences ce mois"  value={stats.month.absent} icon={XCircle} color="red" />

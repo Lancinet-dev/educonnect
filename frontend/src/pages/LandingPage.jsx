@@ -265,7 +265,7 @@ function Why() {
           <h2 className="text-3xl sm:text-4xl font-bold font-display text-white">Pourquoi EduConnect</h2>
           <p className="text-surface-400 mt-3">Conçu pour le contexte réel des écoles guinéennes.</p>
         </motion.div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
           {args.map((a, i) => (
             <motion.div key={a.title} {...fade} transition={{ ...fade.transition, delay: i * 0.1 }}
               className="text-center">

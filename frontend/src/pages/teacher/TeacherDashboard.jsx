@@ -64,7 +64,7 @@ function Overview() {
       </div>
 
       {/* Chiffres clés */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard label="Mes classes"  value={counts.classes}          icon={BookOpen}      color="brand" />
         <StatCard label="Mes élèves"   value={counts.students}         icon={GraduationCap} color="blue" />
         <StatCard label="Présents"     value={attendanceToday.present} icon={CheckCircle2}  color="green" />

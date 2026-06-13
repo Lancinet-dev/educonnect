@@ -61,7 +61,7 @@ function Overview() {
       </div>
 
       {/* Indicateurs clés */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard label="Recettes ce mois"   value={formatGNF(finances.revenueThisMonth)} icon={Wallet}       color="green" />
         <StatCard label="Dépenses ce mois"   value={formatGNF(finances.expensesThisMonth ?? 0)} icon={TrendingDown} color="red" />
         <StatCard label="Solde net du mois"  value={formatGNF(finances.netBalance ?? finances.revenueThisMonth)}

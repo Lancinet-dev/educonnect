@@ -231,7 +231,7 @@ export default function MessagesPage() {
   const selectConv = (id) => { setSelected(id); setParams({ c: id }) }
 
   return (
-    <div className="h-[calc(100dvh-9rem)] min-h-[460px] flex flex-col">
+    <div className="h-[calc(100dvh-11.5rem)] lg:h-[calc(100dvh-9rem)] min-h-[440px] flex flex-col">
       <h1 className="text-2xl font-bold font-display text-surface-900 mb-3 shrink-0">Messages</h1>
 
       <Card padding={false} className="flex-1 min-h-0 overflow-hidden">
