@@ -16,6 +16,7 @@ import { formatGNF } from '@/utils/format'
 import MessagesPage from '@/pages/communication/MessagesPage'
 import AnnouncementsPage from '@/pages/communication/AnnouncementsPage'
 import FounderSchools from './FounderSchools'
+import FounderSchoolDetail from './FounderSchoolDetail'
 import FounderFinances from './FounderFinances'
 import FounderReports from './FounderReports'
 
@@ -218,6 +219,7 @@ export default function FounderDashboard() {
     <Routes>
       <Route index element={<Overview />} />
       <Route path="ecoles" element={<FounderSchools />} />
+      <Route path="ecoles/:id" element={<FounderSchoolDetail />} />
       <Route path="finances" element={<FounderFinances />} />
       <Route path="rapports" element={<FounderReports />} />
       <Route path="messages" element={<MessagesPage />} />
