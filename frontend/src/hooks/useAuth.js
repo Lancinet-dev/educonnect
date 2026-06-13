@@ -1,16 +1,22 @@
 import { useAuthStore } from '@/store/authStore'
 import { useNavigate } from 'react-router-dom'
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import api from '@/services/api'
+import { disconnectSocket } from '@/services/socket'
 import toast from 'react-hot-toast'
 
 export function useAuth() {
-  const store   = useAuthStore()
+  const store    = useAuthStore()
   const navigate = useNavigate()
+  const queryClient = useQueryClient()
 
   const loginMutation = useMutation({
     mutationFn: (credentials) => api.post('/auth/login', credentials),
     onSuccess: ({ data }) => {
+      // Repartir d'un cache vierge : aucune donnée d'un compte précédent
+      // ne doit subsister dans ce navigateur (confidentialité).
+      queryClient.clear()
+      disconnectSocket()
       store.setAuth(data.user, data.accessToken)
       localStorage.setItem('educonnect-refresh-token', data.refreshToken)
       toast.success(`Bienvenue, ${data.user.first_name} !`)
@@ -34,8 +40,11 @@ export function useAuth() {
       const refreshToken = localStorage.getItem('educonnect-refresh-token')
       await api.post('/auth/logout', { refreshToken })
     } finally {
+      disconnectSocket()
       store.logout()
       localStorage.removeItem('educonnect-refresh-token')
+      // Purger tout le cache pour qu'aucune donnée ne reste accessible
+      queryClient.clear()
       navigate('/login')
     }
   }

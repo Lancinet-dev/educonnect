@@ -92,14 +92,15 @@ export default function AppLayout({ children }) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const navigate = useNavigate()
   const qc = useQueryClient()
+  const accessToken = useAuthStore(s => s.accessToken)
 
   const menuItems = MENUS[role] || []
 
-  // Connexion temps réel (Socket.IO) + rafraîchissement des données à la réception
+  // Connexion temps réel (Socket.IO) + rafraîchissement des données à la réception.
+  // Se reconnecte si le token change (changement de compte).
   useEffect(() => {
-    const token = useAuthStore.getState().accessToken
-    if (!token) return
-    const s = connectSocket(token)
+    if (!accessToken) return
+    const s = connectSocket(accessToken)
 
     const refreshNotif = () => qc.invalidateQueries({ queryKey: ['notifications'] })
     const onMessage = () => {
@@ -126,7 +127,7 @@ export default function AppLayout({ children }) {
       s.off('announcement:new', onAnnouncement)
       s.off('homework:new', onHomework)
     }
-  }, [qc])
+  }, [qc, accessToken])
 
   const handleLogout = async () => {
     disconnectSocket()
