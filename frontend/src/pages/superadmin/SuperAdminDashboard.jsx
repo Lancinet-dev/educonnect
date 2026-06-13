@@ -19,7 +19,7 @@ import SuperAdminUsers from './SuperAdminUsers'
 import SuperAdminStats from './SuperAdminStats'
 import SuperAdminSettings from './SuperAdminSettings'
 
-const PLAN_COLORS = { premium: '#6366f1', free: '#cbd5e1' }
+const PLAN_COLORS = { premium: '#2563eb', free: '#cbd5e1' }
 
 // ── Vue d'ensemble de la plateforme ───────────────────────────
 function Overview() {
@@ -110,7 +110,7 @@ function Overview() {
                     <Cell key={entry.key} fill={PLAN_COLORS[entry.key]} />
                   ))}
                 </Pie>
-                <Tooltip contentStyle={{ borderRadius: 8, border: '1px solid #e4e4e7', fontSize: 13 }} />
+                <Tooltip contentStyle={{ borderRadius: 12, border: '1px solid #f3f4f6', fontSize: 13, boxShadow: '0 12px 32px rgba(0,0,0,0.08)', padding: '8px 12px' }} />
               </PieChart>
             </ResponsiveContainer>
             <div className="space-y-3">
@@ -144,11 +144,11 @@ function Overview() {
           {signupHistory.length > 0 ? (
             <ResponsiveContainer width="100%" height={240}>
               <BarChart data={signupHistory}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f1f1f3" vertical={false} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" vertical={false} />
                 <XAxis dataKey="month" tick={{ fontSize: 12, fill: '#71717a' }} axisLine={false} tickLine={false} />
                 <YAxis allowDecimals={false} tick={{ fontSize: 12, fill: '#71717a' }} axisLine={false} tickLine={false} />
-                <Tooltip contentStyle={{ borderRadius: 8, border: '1px solid #e4e4e7', fontSize: 13 }} />
-                <Bar dataKey="total" name="Écoles inscrites" fill="#6366f1" radius={[6, 6, 0, 0]} />
+                <Tooltip contentStyle={{ borderRadius: 12, border: '1px solid #f3f4f6', fontSize: 13, boxShadow: '0 12px 32px rgba(0,0,0,0.08)', padding: '8px 12px' }} />
+                <Bar dataKey="total" name="Écoles inscrites" fill="#2563eb" radius={[6, 6, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           ) : (

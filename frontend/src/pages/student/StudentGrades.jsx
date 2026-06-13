@@ -51,7 +51,7 @@ export function ResultsView({ results, studentId, fullName }) {
           <Card key={s.subjectId}>
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2.5">
-                <span className="w-2.5 h-2.5 rounded-full" style={{ background: s.color || '#6366f1' }} />
+                <span className="w-2.5 h-2.5 rounded-full" style={{ background: s.color || '#2563eb' }} />
                 <h3 className="font-semibold text-surface-900">{s.subject}</h3>
                 <Badge variant="default">coef {s.coefficient}</Badge>
               </div>

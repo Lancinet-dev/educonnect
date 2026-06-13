@@ -53,13 +53,13 @@ export default function DirectorFinances() {
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-center">
                 <ResponsiveContainer width="100%" height={220}>
                   <BarChart data={data.revenueByType}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#f1f1f3" vertical={false} />
+                    <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" vertical={false} />
                     <XAxis dataKey="typeLabel" tick={{ fontSize: 12, fill: '#71717a' }} axisLine={false} tickLine={false} />
                     <YAxis tick={{ fontSize: 12, fill: '#71717a' }} axisLine={false} tickLine={false}
                            tickFormatter={(v) => `${(v / 1000000).toFixed(0)}M`} />
                     <Tooltip formatter={(v) => formatGNF(v)}
-                             contentStyle={{ borderRadius: 8, border: '1px solid #e4e4e7', fontSize: 13 }} />
-                    <Bar dataKey="total" name="Recettes" fill="#6366f1" radius={[6, 6, 0, 0]} />
+                             contentStyle={{ borderRadius: 12, border: '1px solid #f3f4f6', fontSize: 13, boxShadow: '0 12px 32px rgba(0,0,0,0.08)', padding: '8px 12px' }} />
+                    <Bar dataKey="total" name="Recettes" fill="#2563eb" radius={[6, 6, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
                 <div className="space-y-2">

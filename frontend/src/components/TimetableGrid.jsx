@@ -51,7 +51,7 @@ export default function TimetableGrid({ slots = [], mode = 'view-class', onCellC
                       <button
                         onClick={() => (editable ? onSlotClick?.(slot) : null)}
                         className={`w-full text-left rounded-lg p-2 border-l-4 ${editable ? 'hover:ring-2 hover:ring-brand-200 cursor-pointer' : 'cursor-default'}`}
-                        style={{ borderColor: slot.color || '#6366f1', background: (slot.color || '#6366f1') + '14' }}>
+                        style={{ borderColor: slot.color || '#2563eb', background: (slot.color || '#2563eb') + '14' }}>
                         <p className="text-xs font-semibold text-surface-900 leading-tight">{slot.subject || 'Cours'}</p>
                         {secondary(slot) && <p className="text-[10px] text-surface-500 mt-0.5 truncate">{secondary(slot)}</p>}
                         {slot.room && <p className="text-[10px] text-surface-400">{slot.room}</p>}

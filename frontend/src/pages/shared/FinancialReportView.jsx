@@ -94,10 +94,10 @@ export default function FinancialReportView() {
             <h3 className="font-semibold text-surface-900 mb-4">Évolution sur l'année {year}</h3>
             <ResponsiveContainer width="100%" height={260}>
               <LineChart data={chartData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f1f1f3" vertical={false} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" vertical={false} />
                 <XAxis dataKey="name" tick={{ fontSize: 12, fill: '#71717a' }} axisLine={false} tickLine={false} />
                 <YAxis tick={{ fontSize: 12, fill: '#71717a' }} axisLine={false} tickLine={false} tickFormatter={(v) => `${(v / 1000000).toFixed(0)}M`} />
-                <Tooltip formatter={(v) => formatGNF(v)} contentStyle={{ borderRadius: 8, border: '1px solid #e4e4e7', fontSize: 13 }} />
+                <Tooltip formatter={(v) => formatGNF(v)} contentStyle={{ borderRadius: 12, border: '1px solid #f3f4f6', fontSize: 13, boxShadow: '0 12px 32px rgba(0,0,0,0.08)', padding: '8px 12px' }} />
                 <Legend />
                 <Line type="monotone" dataKey="Recettes" stroke="#10b981" strokeWidth={2.5} dot={false} />
                 <Line type="monotone" dataKey="Dépenses" stroke="#ef4444" strokeWidth={2.5} dot={false} />

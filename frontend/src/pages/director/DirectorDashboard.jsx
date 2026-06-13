@@ -178,13 +178,13 @@ function Overview() {
           <h3 className="font-semibold text-surface-900 mb-4">Effectifs par classe</h3>
           <ResponsiveContainer width="100%" height={240}>
             <BarChart data={classDistribution}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#f1f1f3" vertical={false} />
+              <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" vertical={false} />
               <XAxis dataKey="name" tick={{ fontSize: 12, fill: '#71717a' }} axisLine={false} tickLine={false} />
               <YAxis tick={{ fontSize: 12, fill: '#71717a' }} axisLine={false} tickLine={false} />
               <Tooltip
-                contentStyle={{ borderRadius: 8, border: '1px solid #e4e4e7', fontSize: 13 }}
+                contentStyle={{ borderRadius: 12, border: '1px solid #f3f4f6', fontSize: 13, boxShadow: '0 12px 32px rgba(0,0,0,0.08)', padding: '8px 12px' }}
               />
-              <Bar dataKey="students" name="Élèves" fill="#6366f1" radius={[6, 6, 0, 0]} />
+              <Bar dataKey="students" name="Élèves" fill="#2563eb" radius={[6, 6, 0, 0]} />
               <Bar dataKey="capacity" name="Capacité" fill="#e4e4e7" radius={[6, 6, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
@@ -196,16 +196,16 @@ function Overview() {
           {revenueHistory.length > 0 ? (
             <ResponsiveContainer width="100%" height={240}>
               <LineChart data={revenueHistory}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f1f1f3" vertical={false} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" vertical={false} />
                 <XAxis dataKey="month" tick={{ fontSize: 12, fill: '#71717a' }} axisLine={false} tickLine={false} />
                 <YAxis tick={{ fontSize: 12, fill: '#71717a' }} axisLine={false} tickLine={false}
                        tickFormatter={(v) => `${(v/1000000).toFixed(1)}M`} />
                 <Tooltip
                   formatter={(value) => formatGNF(value)}
-                  contentStyle={{ borderRadius: 8, border: '1px solid #e4e4e7', fontSize: 13 }}
+                  contentStyle={{ borderRadius: 12, border: '1px solid #f3f4f6', fontSize: 13, boxShadow: '0 12px 32px rgba(0,0,0,0.08)', padding: '8px 12px' }}
                 />
-                <Line type="monotone" dataKey="total" stroke="#6366f1" strokeWidth={2.5}
-                      dot={{ fill: '#6366f1', r: 4 }} />
+                <Line type="monotone" dataKey="total" stroke="#2563eb" strokeWidth={2.5}
+                      dot={{ fill: '#2563eb', r: 4 }} />
               </LineChart>
             </ResponsiveContainer>
           ) : (

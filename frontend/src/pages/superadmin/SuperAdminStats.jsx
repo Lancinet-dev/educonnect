@@ -13,7 +13,7 @@ const ROLE_LABEL = {
   accountant: 'Comptable', surveillant: 'Surveillant', teacher: 'Enseignant',
   student: 'Élève', parent: 'Parent',
 }
-const COLORS = ['#6366f1', '#10b981', '#f59e0b', '#3b82f6', '#ec4899', '#8b5cf6', '#06b6d4', '#cbd5e1']
+const COLORS = ['#2563eb', '#10b981', '#f59e0b', '#3b82f6', '#ec4899', '#8b5cf6', '#06b6d4', '#cbd5e1']
 
 export default function SuperAdminStats() {
   const { data, isLoading } = useSuperAdminStats()
@@ -40,11 +40,11 @@ export default function SuperAdminStats() {
           <h3 className="font-semibold text-surface-900 mb-4">Croissance des écoles (6 mois)</h3>
           <ResponsiveContainer width="100%" height={240}>
             <BarChart data={data.schoolsByMonth}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#f1f1f3" vertical={false} />
+              <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" vertical={false} />
               <XAxis dataKey="month" tick={{ fontSize: 12, fill: '#71717a' }} axisLine={false} tickLine={false} />
               <YAxis allowDecimals={false} tick={{ fontSize: 12, fill: '#71717a' }} axisLine={false} tickLine={false} />
-              <Tooltip contentStyle={{ borderRadius: 8, border: '1px solid #e4e4e7', fontSize: 13 }} />
-              <Bar dataKey="total" name="Écoles" fill="#6366f1" radius={[6, 6, 0, 0]} />
+              <Tooltip contentStyle={{ borderRadius: 12, border: '1px solid #f3f4f6', fontSize: 13, boxShadow: '0 12px 32px rgba(0,0,0,0.08)', padding: '8px 12px' }} />
+              <Bar dataKey="total" name="Écoles" fill="#2563eb" radius={[6, 6, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </Card>
@@ -54,10 +54,10 @@ export default function SuperAdminStats() {
           {data.studentsByMonth.length > 0 ? (
             <ResponsiveContainer width="100%" height={240}>
               <LineChart data={data.studentsByMonth}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f1f1f3" vertical={false} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" vertical={false} />
                 <XAxis dataKey="month" tick={{ fontSize: 12, fill: '#71717a' }} axisLine={false} tickLine={false} />
                 <YAxis allowDecimals={false} tick={{ fontSize: 12, fill: '#71717a' }} axisLine={false} tickLine={false} />
-                <Tooltip contentStyle={{ borderRadius: 8, border: '1px solid #e4e4e7', fontSize: 13 }} />
+                <Tooltip contentStyle={{ borderRadius: 12, border: '1px solid #f3f4f6', fontSize: 13, boxShadow: '0 12px 32px rgba(0,0,0,0.08)', padding: '8px 12px' }} />
                 <Line type="monotone" dataKey="total" name="Élèves" stroke="#10b981" strokeWidth={2.5} dot={{ fill: '#10b981', r: 4 }} />
               </LineChart>
             </ResponsiveContainer>
@@ -73,7 +73,7 @@ export default function SuperAdminStats() {
               <Pie data={roleData} dataKey="value" nameKey="name" innerRadius={50} outerRadius={80} paddingAngle={2}>
                 {roleData.map((e, i) => <Cell key={i} fill={e.color} />)}
               </Pie>
-              <Tooltip contentStyle={{ borderRadius: 8, border: '1px solid #e4e4e7', fontSize: 13 }} />
+              <Tooltip contentStyle={{ borderRadius: 12, border: '1px solid #f3f4f6', fontSize: 13, boxShadow: '0 12px 32px rgba(0,0,0,0.08)', padding: '8px 12px' }} />
             </PieChart>
           </ResponsiveContainer>
           <div className="flex-1 grid grid-cols-2 gap-2 min-w-[200px]">

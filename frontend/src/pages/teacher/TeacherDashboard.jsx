@@ -130,7 +130,7 @@ function Overview() {
             <div className="space-y-2">
               {timetable.map((slot, i) => (
                 <div key={i} className="flex items-center gap-3 p-3 rounded-lg bg-surface-50">
-                  <span className="w-1.5 h-10 rounded-full shrink-0" style={{ background: slot.color || '#6366f1' }} />
+                  <span className="w-1.5 h-10 rounded-full shrink-0" style={{ background: slot.color || '#2563eb' }} />
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-semibold text-surface-900">{slot.subject || 'Cours'}</p>
                     <p className="text-xs text-surface-500">

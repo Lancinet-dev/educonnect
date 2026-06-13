@@ -126,7 +126,7 @@ function Overview() {
             <div className="space-y-2">
               {timetable.map((slot, i) => (
                 <div key={i} className="flex items-center gap-3 p-3 rounded-lg bg-surface-50">
-                  <span className="w-1.5 h-10 rounded-full shrink-0" style={{ background: slot.color || '#6366f1' }} />
+                  <span className="w-1.5 h-10 rounded-full shrink-0" style={{ background: slot.color || '#2563eb' }} />
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-semibold text-surface-900">{slot.subject || 'Cours'}</p>
                     <p className="text-xs text-surface-500">
@@ -161,7 +161,7 @@ function Overview() {
                 <button key={h.id} onClick={() => navigate('/student/devoirs')}
                   className="w-full text-left p-3 rounded-lg bg-surface-50 hover:bg-surface-100 transition-colors">
                   <div className="flex items-center gap-2">
-                    <span className="w-1.5 h-7 rounded-full shrink-0" style={{ background: h.color || '#6366f1' }} />
+                    <span className="w-1.5 h-7 rounded-full shrink-0" style={{ background: h.color || '#2563eb' }} />
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium text-surface-900 truncate">{h.title}</p>
                       <p className="text-xs text-surface-500">{h.subject || 'Sans matière'} · {new Date(h.dueDate).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })}</p>
@@ -196,7 +196,7 @@ function Overview() {
           <div className="space-y-2">
             {grades.map((g, i) => (
               <div key={i} className="flex items-center gap-3 p-3 rounded-lg bg-surface-50">
-                <span className="w-1.5 h-8 rounded-full shrink-0" style={{ background: g.color || '#6366f1' }} />
+                <span className="w-1.5 h-8 rounded-full shrink-0" style={{ background: g.color || '#2563eb' }} />
                 <div className="flex-1">
                   <p className="text-sm font-semibold text-surface-900">{g.subject || 'Matière'}</p>
                   <p className="text-xs text-surface-500">{g.term || ''}</p>

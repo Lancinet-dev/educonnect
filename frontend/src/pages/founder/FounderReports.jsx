@@ -45,10 +45,10 @@ export default function FounderReports() {
             <h3 className="font-semibold text-surface-900 mb-4">Recettes vs dépenses par école ({MONTHS[month - 1]} {year})</h3>
             <ResponsiveContainer width="100%" height={260}>
               <BarChart data={chartData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f1f1f3" vertical={false} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" vertical={false} />
                 <XAxis dataKey="name" tick={{ fontSize: 12, fill: '#71717a' }} axisLine={false} tickLine={false} />
                 <YAxis tick={{ fontSize: 12, fill: '#71717a' }} axisLine={false} tickLine={false} tickFormatter={(v) => `${(v / 1000000).toFixed(0)}M`} />
-                <Tooltip formatter={(v) => formatGNF(v)} contentStyle={{ borderRadius: 8, border: '1px solid #e4e4e7', fontSize: 13 }} />
+                <Tooltip formatter={(v) => formatGNF(v)} contentStyle={{ borderRadius: 12, border: '1px solid #f3f4f6', fontSize: 13, boxShadow: '0 12px 32px rgba(0,0,0,0.08)', padding: '8px 12px' }} />
                 <Legend />
                 <Bar dataKey="Recettes" fill="#10b981" radius={[6, 6, 0, 0]} />
                 <Bar dataKey="Dépenses" fill="#ef4444" radius={[6, 6, 0, 0]} />

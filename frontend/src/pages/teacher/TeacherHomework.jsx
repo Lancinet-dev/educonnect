@@ -180,7 +180,7 @@ export default function TeacherHomework() {
           {homework.map(h => (
             <Card key={h.id}>
               <div className="flex items-start gap-3">
-                <span className="w-1.5 self-stretch rounded-full shrink-0" style={{ background: h.color || '#6366f1' }} />
+                <span className="w-1.5 self-stretch rounded-full shrink-0" style={{ background: h.color || '#2563eb' }} />
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
                     <h3 className="font-semibold text-surface-900">{h.title}</h3>

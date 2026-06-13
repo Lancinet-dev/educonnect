@@ -79,7 +79,7 @@ export default function ParentHomework() {
               <div key={h.id} className="flex items-center gap-3 p-3 rounded-lg border border-surface-100">
                 {h.done
                   ? <CheckCircle2 size={20} className="text-emerald-500 shrink-0" />
-                  : <span className="w-1.5 h-8 rounded-full shrink-0" style={{ background: h.color || '#6366f1' }} />}
+                  : <span className="w-1.5 h-8 rounded-full shrink-0" style={{ background: h.color || '#2563eb' }} />}
                 <div className="flex-1 min-w-0">
                   <p className={`text-sm font-medium ${h.done ? 'text-surface-400 line-through' : 'text-surface-900'}`}>{h.title}</p>
                   <p className="text-xs text-surface-500">

@@ -25,7 +25,7 @@ const METHOD_LABELS = {
   bank:         'Virement bancaire',
   other:        'Autre',
 }
-const METHOD_COLORS = ['#6366f1', '#10b981', '#f59e0b', '#3b82f6', '#cbd5e1']
+const METHOD_COLORS = ['#2563eb', '#10b981', '#f59e0b', '#3b82f6', '#cbd5e1']
 
 function Overview() {
   const { data, isLoading, error } = useAccountantOverview()
@@ -95,12 +95,12 @@ function Overview() {
           {revenueHistory.length > 0 ? (
             <ResponsiveContainer width="100%" height={240}>
               <LineChart data={revenueHistory}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f1f1f3" vertical={false} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" vertical={false} />
                 <XAxis dataKey="month" tick={{ fontSize: 12, fill: '#71717a' }} axisLine={false} tickLine={false} />
                 <YAxis tick={{ fontSize: 12, fill: '#71717a' }} axisLine={false} tickLine={false}
                        tickFormatter={(v) => `${(v/1000000).toFixed(0)}M`} />
                 <Tooltip formatter={(value) => formatGNF(value)}
-                         contentStyle={{ borderRadius: 8, border: '1px solid #e4e4e7', fontSize: 13 }} />
+                         contentStyle={{ borderRadius: 12, border: '1px solid #f3f4f6', fontSize: 13, boxShadow: '0 12px 32px rgba(0,0,0,0.08)', padding: '8px 12px' }} />
                 <Line type="monotone" dataKey="total" stroke="#10b981" strokeWidth={2.5}
                       dot={{ fill: '#10b981', r: 4 }} />
               </LineChart>
@@ -123,7 +123,7 @@ function Overview() {
                     {methodData.map((entry, i) => <Cell key={i} fill={entry.color} />)}
                   </Pie>
                   <Tooltip formatter={(value) => formatGNF(value)}
-                           contentStyle={{ borderRadius: 8, border: '1px solid #e4e4e7', fontSize: 13 }} />
+                           contentStyle={{ borderRadius: 12, border: '1px solid #f3f4f6', fontSize: 13, boxShadow: '0 12px 32px rgba(0,0,0,0.08)', padding: '8px 12px' }} />
                 </PieChart>
               </ResponsiveContainer>
               <div className="space-y-3 flex-1">

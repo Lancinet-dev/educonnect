@@ -15,7 +15,7 @@ function HomeworkItem({ hw, onToggle, busy }) {
           ? <CheckCircle2 size={22} className="text-emerald-500" />
           : <Circle size={22} className="text-surface-300 hover:text-brand-500" />}
       </button>
-      <span className="w-1.5 self-stretch rounded-full shrink-0" style={{ background: hw.color || '#6366f1' }} />
+      <span className="w-1.5 self-stretch rounded-full shrink-0" style={{ background: hw.color || '#2563eb' }} />
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 flex-wrap">
           <p className={`font-medium ${hw.done ? 'text-surface-400 line-through' : 'text-surface-900'}`}>{hw.title}</p>
