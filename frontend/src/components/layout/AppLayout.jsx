@@ -12,6 +12,8 @@ import { connectSocket, disconnectSocket } from '@/services/socket'
 import Avatar from '@/components/ui/Avatar'
 import Badge from '@/components/ui/Badge'
 import NotificationBell from './NotificationBell'
+import AvatarUploader from '@/components/AvatarUploader'
+import { useUploadStatus } from '@/hooks/useUpload'
 import { clsx } from 'clsx'
 
 const MENUS = {
@@ -94,6 +96,8 @@ export default function AppLayout({ children }) {
   const navigate = useNavigate()
   const qc = useQueryClient()
   const accessToken = useAuthStore(s => s.accessToken)
+  const updateUser = useAuthStore(s => s.updateUser)
+  const { data: uploadStatus } = useUploadStatus()
 
   const menuItems = MENUS[role] || []
 
@@ -205,12 +209,12 @@ export default function AppLayout({ children }) {
         {/* Profil en bas */}
         <div className="px-3 py-4 border-t border-surface-100">
           <div className="flex items-center gap-3 px-2 py-2 rounded-lg hover:bg-surface-50
-                          transition-colors cursor-pointer">
-            <Avatar
-              firstName={user?.first_name}
-              lastName={user?.last_name}
-              src={user?.avatar_url}
+                          transition-colors">
+            <AvatarUploader
+              user={user}
               size="sm"
+              enabled={uploadStatus?.enabled}
+              onUploaded={(url) => updateUser({ avatar_url: url })}
             />
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium text-surface-900 truncate">{fullName}</p>

@@ -25,7 +25,11 @@ import financeRoutes from './routes/finance.routes.js'
 import homeworkRoutes from './routes/homework.routes.js'
 import timetableRoutes from './routes/timetable.routes.js'
 import managementRoutes from './routes/management.routes.js'
+import uploadRoutes from './routes/upload.routes.js'
 import { initRealtime } from './realtime.js'
+import { initCloudinary } from './config/cloudinary.js'
+
+initCloudinary()
 
 const app        = express()
 const httpServer = createServer(app)
@@ -65,6 +69,7 @@ app.use('/api/finance', financeRoutes)
 app.use('/api/homework', homeworkRoutes)
 app.use('/api/timetable', timetableRoutes)
 app.use('/api/management', managementRoutes)
+app.use('/api/upload', uploadRoutes)
 
 // Health check
 app.get('/api/health', async (req, res) => {

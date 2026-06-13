@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { CheckCircle2, AlertTriangle, ClipboardList, GraduationCap } from 'lucide-react'
+import { CheckCircle2, AlertTriangle, ClipboardList, GraduationCap, Paperclip } from 'lucide-react'
 import { useParentHomework } from '@/hooks/useHomework'
 import Card from '@/components/ui/Card'
 import Badge from '@/components/ui/Badge'
@@ -82,7 +82,14 @@ export default function ParentHomework() {
                   : <span className="w-1.5 h-8 rounded-full shrink-0" style={{ background: h.color || '#6366f1' }} />}
                 <div className="flex-1 min-w-0">
                   <p className={`text-sm font-medium ${h.done ? 'text-surface-400 line-through' : 'text-surface-900'}`}>{h.title}</p>
-                  <p className="text-xs text-surface-500">{h.subject || 'Sans matière'} · à rendre le {fmt(h.dueDate)}</p>
+                  <p className="text-xs text-surface-500">
+                    {h.subject || 'Sans matière'} · à rendre le {fmt(h.dueDate)}
+                    {h.attachmentUrl && (
+                      <a href={h.attachmentUrl} target="_blank" rel="noreferrer" className="text-brand-600 hover:underline inline-flex items-center gap-1 ml-2">
+                        <Paperclip size={11} /> Pièce jointe
+                      </a>
+                    )}
+                  </p>
                 </div>
                 {h.done
                   ? <Badge variant="success">Fait</Badge>

@@ -41,15 +41,15 @@ const mapHw = (h) => ({
 // ── POST /api/homework  (enseignant/staff) ────────────────────
 router.post('/', authorize('teacher', 'school_admin', 'super_admin'), async (req, res, next) => {
   try {
-    const { classId, subjectId, title, description, dueDate } = req.body
+    const { classId, subjectId, title, description, dueDate, attachmentUrl } = req.body
     const cls = await canAccessClass(req.user, classId)
     if (!cls) return res.status(403).json({ error: 'Accès à cette classe refusé.' })
     if (!title?.trim() || !dueDate) return res.status(400).json({ error: 'Titre et date limite requis.' })
 
     const { rows } = await query(
-      `INSERT INTO homework (school_id, class_id, subject_id, teacher_id, title, description, due_date)
-       VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id`,
-      [cls.school_id, classId, subjectId || null, req.user.id, title.trim(), description?.trim() || null, dueDate]
+      `INSERT INTO homework (school_id, class_id, subject_id, teacher_id, title, description, due_date, attachment_url)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id`,
+      [cls.school_id, classId, subjectId || null, req.user.id, title.trim(), description?.trim() || null, dueDate, attachmentUrl || null]
     )
     const hwId = rows[0].id
 
@@ -110,10 +110,11 @@ router.put('/:id', authorize('teacher', 'school_admin', 'super_admin'), async (r
   try {
     const { hw, error } = await ownedHomework(req.user, req.params.id)
     if (error) return res.status(error).json({ error: error === 404 ? 'Devoir introuvable.' : 'Accès refusé.' })
-    const { subjectId, title, description, dueDate } = req.body
+    const { subjectId, title, description, dueDate, attachmentUrl } = req.body
     await query(
-      `UPDATE homework SET subject_id = $1, title = $2, description = $3, due_date = $4 WHERE id = $5`,
-      [subjectId ?? hw.subject_id, title?.trim() || hw.title, description?.trim() ?? hw.description, dueDate || hw.due_date, hw.id]
+      `UPDATE homework SET subject_id = $1, title = $2, description = $3, due_date = $4, attachment_url = $5 WHERE id = $6`,
+      [subjectId ?? hw.subject_id, title?.trim() || hw.title, description?.trim() ?? hw.description, dueDate || hw.due_date,
+       attachmentUrl !== undefined ? attachmentUrl : hw.attachment_url, hw.id]
     )
     res.json({ ok: true })
   } catch (err) { next(err) }
@@ -195,7 +196,7 @@ router.get('/parent', authorize('parent', 'super_admin'), async (req, res, next)
     const result = []
     for (const c of children) {
       const { rows: hw } = await query(
-        `SELECT h.id, h.title, h.due_date, s.name AS subject_name, s.color,
+        `SELECT h.id, h.title, h.due_date, h.attachment_url, s.name AS subject_name, s.color,
                 (hd.student_id IS NOT NULL) AS done
          FROM homework h
          JOIN class_students cs ON cs.class_id = h.class_id AND cs.student_id = $1
@@ -212,7 +213,7 @@ router.get('/parent', authorize('parent', 'super_admin'), async (req, res, next)
         pendingCount: pending.length, overdueCount: overdue.length,
         homework: hw.map(h => ({
           id: h.id, title: h.title, subject: h.subject_name, color: h.color,
-          dueDate: h.due_date, done: h.done,
+          dueDate: h.due_date, done: h.done, attachmentUrl: h.attachment_url,
           overdue: !h.done && new Date(h.due_date) < today,
         })),
       })

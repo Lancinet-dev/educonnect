@@ -1,5 +1,5 @@
 import toast from 'react-hot-toast'
-import { CheckCircle2, Circle, ClipboardList, AlertTriangle } from 'lucide-react'
+import { CheckCircle2, Circle, ClipboardList, AlertTriangle, Paperclip } from 'lucide-react'
 import { useStudentHomework, useToggleHomeworkDone } from '@/hooks/useHomework'
 import Card from '@/components/ui/Card'
 import Badge from '@/components/ui/Badge'
@@ -23,7 +23,15 @@ function HomeworkItem({ hw, onToggle, busy }) {
           {hw.overdue && <Badge variant="danger"><AlertTriangle size={12} /> En retard</Badge>}
         </div>
         {hw.description && <p className="text-sm text-surface-600 mt-1">{hw.description}</p>}
-        <p className="text-xs text-surface-500 mt-1">À rendre le {fmt(hw.dueDate)}</p>
+        <div className="flex items-center gap-3 mt-1">
+          <p className="text-xs text-surface-500">À rendre le {fmt(hw.dueDate)}</p>
+          {hw.attachmentUrl && (
+            <a href={hw.attachmentUrl} target="_blank" rel="noreferrer"
+              className="text-xs text-brand-600 hover:underline flex items-center gap-1">
+              <Paperclip size={12} /> Pièce jointe
+            </a>
+          )}
+        </div>
       </div>
     </div>
   )

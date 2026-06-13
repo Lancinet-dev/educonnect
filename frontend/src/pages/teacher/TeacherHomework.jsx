@@ -2,13 +2,14 @@ import { useState, useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import toast from 'react-hot-toast'
 import {
-  Plus, X, Pencil, Trash2, ClipboardList, Paperclip, CheckCircle2, Users,
+  Plus, X, Pencil, Trash2, ClipboardList, Paperclip, CheckCircle2, Users, FileUp,
 } from 'lucide-react'
 import {
   useTeacherHomework, useCreateHomework, useUpdateHomework, useDeleteHomework,
 } from '@/hooks/useHomework'
 import { useAttendanceClasses } from '@/hooks/useAttendance'
 import { useGradeSubjects } from '@/hooks/useGrades'
+import { useUploadStatus, uploadHomeworkFile } from '@/hooks/useUpload'
 import Card from '@/components/ui/Card'
 import Button from '@/components/ui/Button'
 import Badge from '@/components/ui/Badge'
@@ -24,21 +25,39 @@ function HomeworkForm({ initial, onClose }) {
   const update = useUpdateHomework()
   const { data: classes } = useAttendanceClasses()
   const { data: subjects } = useGradeSubjects()
+  const { data: uploadStatus } = useUploadStatus()
 
   const [classId, setClassId] = useState(initial?.classId || '')
   const [subjectId, setSubjectId] = useState(initial?.subjectId || '')
   const [title, setTitle] = useState(initial?.title || '')
   const [description, setDescription] = useState(initial?.description || '')
   const [dueDate, setDueDate] = useState(initial ? String(initial.dueDate).slice(0, 10) : '')
+  const [attachmentUrl, setAttachmentUrl] = useState(initial?.attachmentUrl || '')
+  const [attachmentName, setAttachmentName] = useState(initial?.attachmentUrl ? 'Fichier joint' : '')
+  const [uploading, setUploading] = useState(false)
+
+  const handleFile = async (e) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setUploading(true)
+    try {
+      const r = await uploadHomeworkFile(file)
+      setAttachmentUrl(r.url); setAttachmentName(r.name)
+      toast.success('Pièce jointe ajoutée')
+    } catch (err) {
+      toast.error(err?.response?.data?.error || "Échec de l'envoi du fichier.")
+    } finally { setUploading(false); e.target.value = '' }
+  }
 
   const submit = async () => {
     if (!classId || !title.trim() || !dueDate) { toast.error('Classe, titre et date limite requis.'); return }
+    const common = { subjectId: subjectId || null, title: title.trim(), description, dueDate, attachmentUrl: attachmentUrl || null }
     try {
       if (isEdit) {
-        await update.mutateAsync({ id: initial.id, subjectId: subjectId || null, title: title.trim(), description, dueDate })
+        await update.mutateAsync({ id: initial.id, ...common })
         toast.success('Devoir modifié')
       } else {
-        await create.mutateAsync({ classId, subjectId: subjectId || null, title: title.trim(), description, dueDate })
+        await create.mutateAsync({ classId, ...common })
         toast.success('Devoir publié · élèves et parents notifiés')
       }
       onClose()
@@ -86,9 +105,28 @@ function HomeworkForm({ initial, onClose }) {
             <input type="date" value={dueDate} min={today()} onChange={e => setDueDate(e.target.value)}
               className="w-full px-3 py-2 border border-surface-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500" />
           </div>
-          <div className="flex items-center gap-2 p-3 rounded-lg bg-surface-50 text-surface-400 text-sm">
-            <Paperclip size={16} /> Pièce jointe — à venir
-          </div>
+          {/* Pièce jointe (si Cloudinary configuré) */}
+          {uploadStatus?.enabled ? (
+            <div>
+              <label className="text-sm font-medium text-surface-700 block mb-1.5">Pièce jointe (optionnel)</label>
+              {attachmentUrl ? (
+                <div className="flex items-center gap-2 p-2.5 rounded-lg bg-emerald-50 text-sm">
+                  <Paperclip size={15} className="text-emerald-600" />
+                  <a href={attachmentUrl} target="_blank" rel="noreferrer" className="flex-1 truncate text-emerald-700 hover:underline">{attachmentName}</a>
+                  <button onClick={() => { setAttachmentUrl(''); setAttachmentName('') }} className="text-surface-400 hover:text-red-500"><X size={15} /></button>
+                </div>
+              ) : (
+                <label className="flex items-center gap-2 p-2.5 rounded-lg border border-dashed border-surface-300 text-surface-500 text-sm cursor-pointer hover:border-brand-300">
+                  <FileUp size={16} /> {uploading ? 'Envoi en cours…' : 'Joindre un fichier'}
+                  <input type="file" className="hidden" onChange={handleFile} disabled={uploading} />
+                </label>
+              )}
+            </div>
+          ) : (
+            <div className="flex items-center gap-2 p-3 rounded-lg bg-surface-50 text-surface-400 text-sm">
+              <Paperclip size={16} /> Pièce jointe — activez Cloudinary pour l'utiliser
+            </div>
+          )}
         </div>
         <div className="flex justify-end gap-2 p-4 border-t border-surface-100">
           <Button variant="ghost" onClick={onClose}>Annuler</Button>
