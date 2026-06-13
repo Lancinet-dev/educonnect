@@ -13,6 +13,7 @@ import StatCard from '@/components/ui/StatCard'
 import Card from '@/components/ui/Card'
 import Spinner from '@/components/ui/Spinner'
 import { formatGNF } from '@/utils/format'
+import AccountantPayments from './AccountantPayments'
 
 const METHOD_LABELS = {
   cash:         'Espèces',
@@ -174,6 +175,7 @@ export default function AccountantDashboard() {
   return (
     <Routes>
       <Route index element={<Overview />} />
+      <Route path="paiements" element={<AccountantPayments />} />
     </Routes>
   )
 }

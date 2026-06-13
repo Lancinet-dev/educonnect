@@ -15,6 +15,7 @@ import Spinner from '@/components/ui/Spinner'
 import { formatGNF } from '@/utils/format'
 import ParentAttendance from './ParentAttendance'
 import ParentResults from './ParentResults'
+import ParentPayments from './ParentPayments'
 import MessagesPage from '@/pages/communication/MessagesPage'
 import AnnouncementsPage from '@/pages/communication/AnnouncementsPage'
 
@@ -232,6 +233,7 @@ export default function ParentDashboard() {
       <Route index element={<Overview />} />
       <Route path="presences" element={<ParentAttendance />} />
       <Route path="resultats" element={<ParentResults />} />
+      <Route path="paiements" element={<ParentPayments />} />
       <Route path="messages" element={<MessagesPage />} />
       <Route path="annonces" element={<AnnouncementsPage />} />
     </Routes>
